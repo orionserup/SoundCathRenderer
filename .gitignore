@@ -97,11 +97,14 @@ StyleCopReport.xml
 *.pidb
 *.svclog
 *.scc
+<<<<<<< HEAD
 *.vcxproj
 *.cmake
 *.sln
 *.filters
 
+=======
+>>>>>>> c58a3b4 (Add .gitignore and .gitattributes.)
 
 # Chutzpah Test files
 _Chutzpah*
