@@ -1,11 +1,10 @@
-#include "ASIC.hpp"
-#include "Renderer.hpp"
 
-using namespace SoundCath;
+#include <iostream>
 
 int main(int argc, char** kwargs) {
 
-	
+	std::cout << "Hello World\n";
 	
 	return EXIT_FAILURE;
 }
+

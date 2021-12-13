@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 cmake_minimum_required( VERSION 3.10 )
 
 project(SoundCathRenderer LANGUAGES CXX VERSION 0.1)
@@ -42,23 +42,10 @@ target_include_directories(${PROJECT_NAME} PUBLIC ../include)
 target_link_libraries(UltraSound ${VTK_LIBRARIES} Eigen3::Eigen)
 target_link_libraries(${PROJECT_NAME} UltraSound)
 
-=======
-cmake_minimum_required( VERSION 3.10)
-
-project(SoundCathRenderer LANGUAGES CXX  VERSION 0.1)
-
-find_package(OpenCV REQUIRED)
-
-set(CMAKE_CXX_COMPILER msvc)
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_BINARY_DIR ../bin)
-
 file( GLOB SOURCES ../src/*.cpp )
 target_include_directories( "${PROJECT_NAME}" ../include)
 target_link_libraries( "${PROJECT_NAME}" ../lib/asic_call_wrapper.dll ${OPENCV_LIBS})
 add_executable("${PROJECT_NAME}" SOURCES)
->>>>>>> f7ce3db (Add project files.)
 
 
 
