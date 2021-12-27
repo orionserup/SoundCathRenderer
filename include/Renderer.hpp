@@ -1,3 +1,4 @@
+
 /**
  * @brief  
  * @note   
@@ -9,72 +10,7 @@
 #include <vector>
 #include <array>
 
-
-namespace SoundCath{
-
-<<<<<<< HEAD
-=======
-/**
- * @brief  
- * @note   
- * @retval None
- */
-class Point {
-
-public:
-
-    /**
-     * @brief  
-     * @note   
-     * @retval 
-     */
-    Point() = default;
-
-    /**
-     * @brief  
-     * @note   
-     * @param  R: 
-     * @param  xdeg: 
-     * @param  ydeg: 
-     * @retval 
-     */
-    Point(const float R, const float xdeg, const float ydeg);
-
-    /**
-     * @brief  
-     * @note   
-     * @param  R: 
-     * @retval None
-     */
-    void SetR(const float R);
-
-    /**
-     * @brief  
-     * @note   
-     * @param  XDeg: 
-     * @retval None
-     */
-    void SetXDeg(const float XDeg);
-
-    /**
-     * @brief  
-     * @note   
-     * @param  YDeg: 
-     * @retval None
-     */
-    void SetYDeg(const float YDeg);
-
-    float GetR();
-    float GetXDeg();
-    float GetYDeg();
-
-private:
-
-    std::array<float, 3> point; //< Storage of the 3D coordinates
-
-};
-
->>>>>>> parent of f887b8f (added docs)
+namespace SoundCath {
 class Renderer {
 
 public:

@@ -46,7 +46,7 @@ namespace SoundCath
      */
     enum InternalError : uint32_t{
 
-    };
+        enum DriverError : uint32_t {
 
     /**
      * @brief Gets the error Message Cooresponding with the Error
@@ -66,7 +66,13 @@ namespace SoundCath
     class Interface
     {
 
-    public:
+        };
+
+        enum InternalError : uint32_t {
+
+            OK = 0,
+
+        };
 
             /**
          * @brief
