@@ -37,37 +37,25 @@ namespace SoundCath {
          */
         enum Mode : uint8_t {
 
-            CW, ///< Continuous Mode
+            CW ///< Continuous Mode
 
         };
 
         /**
          * @brief  Exception Struct for Error handling
          */
-        struct Exception {
+        class Exception {
+
+        public:
+
+            Exception(std::string& message) { this->message = message; }
+            std::string& GetMessage();
+
+        private:
+
+            std::string message; //< Message associated with the Exception
  
         };
-
-        /**
-         * @brief Default Constructor (25MHz and a Default Driver
-         */
-        ASIC() = default;
-
-        /**
-         * @brief  Constructor for ASIC where the driver is the argument
-         * @note   The default speed is used (25MHz)
-         * @param  driver: Reference to an existing ASIC Interface Object 
-         * @retval ASIC Instance 
-         */
-        ASIC(Interface& driver);
-
-        /**
-         * @brief  
-         * @note   
-         * @param  speed: 
-         * @retval 
-         */
-        ASIC(ClkSpeed speed);
 
         /**
          * @brief  
@@ -76,7 +64,14 @@ namespace SoundCath {
          * @param  speed: 
          * @retval 
          */
-        ASIC(Interface& driver, ClkSpeed speed);
+        ASIC(Interface& driver, ClkSpeed speed = LOW);
+
+        /**
+         * @brief Gets the Serial Number from the ASIC
+         * @note Uses Default Serial Number call
+         * @retval string, the serial number in a string form
+         */
+        std::string GetSerialNum();
 
         /**
          * @brief  
@@ -84,32 +79,27 @@ namespace SoundCath {
          * @param  channel: 
          * @retval 
          */
-        double GetOutputCapacitance(const uint8_t channel);
+        double GetOutputCapacitance(const uint8_t channel) const;
 
         /**
          * @brief  
          * @note   
          * @retval 
          */
-        double GetBandGapV();
+        double GetBandGapV() const;
 
         /**
          * @brief  
          * @note   
          * @retval 
          */
-        bool RunTests();
-
-        /**
-         * @brief  
-         * @note   
-         * @retval 
-         */
-        ~ASIC();
+        bool RunTests() const;
 
     private:
 
-        Interface driver;
+        Interface& driver; //< An Instance of the wrapper for the Oldelft API
+        ClkSpeed speed;
+        Mode mode;
 
     };
 

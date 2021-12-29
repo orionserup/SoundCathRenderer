@@ -66,13 +66,22 @@ namespace SoundCath
     class Interface
     {
 
-        };
+    };
 
-        enum InternalError : uint32_t {
+    /**
+     * @brief Gets the error Message Cooresponding with the Error
+     */
+    constexpr const char* GetDriverErrorMessage(DriverError CodedError) noexcept;
 
-            OK = 0,
+    /**
+     * @brief Gets the Error Message Associated with the given Internal Error Codes
+     */
+    constexpr const char* GetInternalErrorMessage(InternalError CodedError) noexcept;
 
-        };
+    /**
+     * @brief  ASIC interfacer class
+     * @note   A wrapper for the Oldeft API
+     */
 
             /**
          * @brief
