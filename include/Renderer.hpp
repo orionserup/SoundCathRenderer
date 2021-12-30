@@ -47,6 +47,9 @@ public:
      * @retval None
      */
     void AddPoint(const Point& point);
+
+private:
+
     std::vector<Point> points;  //< Vector of points to store and display
     uint32_t index;             //< Current index of the vector
 

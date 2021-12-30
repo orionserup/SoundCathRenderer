@@ -5,32 +5,25 @@ using namespace SoundCath;
 
 Interface::Interface() {
 
-	try {
 
-		this->dll = LoadLibrary("../lib/asic_call_wrapper_dll64");
-		if (!this->dll) throw "DLL Not Found or Not Accessable\n";
+	this->dll = LoadLibrary("../lib/asic_call_wrapper_dll64");
+		if (!this->dll) 
+            std::cerr << "\tERROR!!  DLL Not Found or Not Accessable\n";
 
-		asic_call_parse = (f_dllfunction)GetProcAddress(this->dll, "asic_call_parse");
-		if (!this->asic_call_parse) throw "Could Not Access or Find the ASIC Call Function in the DLL\n";
-
-	}
-    catch (std::string& error) {
-
-        std::cerr << "\tERROR!! :: " << error;
-        exit(1);
-
-    }
+	asic_call_parse = (f_dllfunction)GetProcAddress(this->dll, "asic_call_parse");
+	if (!this->asic_call_parse) 
+        std::cerr << "\tERROR!!  Could Not Access or Find the ASIC Call Function in the DLL\n";
 
 }
 
 std::string Interface::Query(const std::string& command) const noexcept {
 
-	int result = asic_call_parse((char*)command.c_str(), (char*)outBuffer);
+	int result = asic_call_parse((char*)command.c_str(), (char*)outBuffer.data());
 		
     if (!result)
 		std::cerr << "\tError!! " << GetDriverErrorMessage((DriverError)result);
 
-    return std::string(outBuffer);
+    return std::string((char*)outBuffer.data());
 
 }
 

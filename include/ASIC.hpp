@@ -49,7 +49,7 @@ namespace SoundCath {
         public:
 
             Exception(std::string& message) { this->message = message; }
-            std::string& GetMessage();
+            std::string& GetMessage() { return this->message; }
 
         private:
 
@@ -98,8 +98,8 @@ namespace SoundCath {
     private:
 
         Interface& driver; //< An Instance of the wrapper for the Oldelft API
-        ClkSpeed speed;
-        Mode mode;
+        ClkSpeed speed;    //< The ASIC Clock Speed
+        Mode mode;         //< The ASIC operation Mode
 
     };
 
