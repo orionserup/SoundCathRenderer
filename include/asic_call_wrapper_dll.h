@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 #ifdef _WIN32
+=======
+>>>>>>> f7ce3db (Add project files.)
 
 #ifndef ASIC_CALL_WRAPPER_H
 	#define ASIC_CALL_WRAPPER_H
@@ -30,5 +33,8 @@ extern "C" {
 #endif
     
 #endif
+<<<<<<< HEAD
 
 #endif
+=======
+>>>>>>> f7ce3db (Add project files.)
