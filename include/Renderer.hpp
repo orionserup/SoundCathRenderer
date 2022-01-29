@@ -31,7 +31,8 @@ public:
      * @note   Used with initial run
      * @param  points: all of the points in the canvas so far
      * @retval Renderer Instance
-    Renderer(const std::vector<Point&>& points);
+     */
+    // Renderer(const std::vector<Point&>& points);
     
     /**
      * @brief  Draws the Points to the screen and renders a model
@@ -46,11 +47,11 @@ public:
      * @param  point: 
      * @retval None
      */
-    void AddPoint(const Point& point);
+    //void AddPoint(const Point& point);
 
 private:
 
-    std::vector<Point> points;  //< Vector of points to store and display
+    //std::vector<Point> points;  //< Vector of points to store and display
     uint32_t index;             //< Current index of the vector
 
 

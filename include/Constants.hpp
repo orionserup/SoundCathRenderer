@@ -1,17 +1,13 @@
 /**
- * \file Transducer.hpp
+ * \file Constants.hpp
  * \author Orion Serup (orionserup@gmail.com)
  * \brief 
  * \version 0.1
- * \date 01-25-2022
+ * \date 01-28-2022
  * 
  * @copyright Copyright (c) 2022
  * 
  */
-
-#pragma once
-
-#include <array>
 
 #define XGROUP_PITCH 4*.000180
 #define YGROUP_PITCH X_PITCH
@@ -23,16 +19,17 @@
 #define L3_FACTOR 1500
 #define L4_FACTOR_SQ 32
 
-using std::array;
+#define ELEMENT_DELAY_FP 3
+#define CENTER_DELAY_FP 3
 
+#define XGROUPS 16
+#define YGROUPS 4
 
-class Transducer {
+#define NUMGROUPS 64
+#define NUMELEMENTS 1024
 
+#define GROUPELEMENTS 16
 
+#define TX_ELEMENTS 16
 
-
-private:
-
-    array<
-
-}
+#define SOUND_SPEED 1540

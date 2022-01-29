@@ -11,37 +11,25 @@
 
 #pragma once
 #include <array>
+#include <vector>
+
 #include "Point.hpp"
+#include "Constants.hpp"
 
 namespace SoundCath {
 
-#define XGROUP_PITCH 4*.000180
-#define YGROUP_PITCH X_PITCH
-
-#define XMAX 7.5
-
-#define L1_FACTOR 4
-#define L2_FACTOR 64
-#define L3_FACTOR 1500
-#define L4_FACTOR_SQ 32
-
-#define ELEMENT_DELAY_FP 3
-#define CENTER_DELAY_FP 3
-#define XGROUPS 16
-#define YGROUPS 4
-#define NUMGROUPS 64
-#define TX_ELEMENTS 16
-
-#define SOUND_SPEED 
-
 using std::array;
+using std::vector;
 
-struct TxData {
+/// Group Delay Types
+typedef array<int16_t, GROUPELEMENTS> GroupDelays;
+typedef array<array<GroupDelays, YGROUPS>, XGROUPS + 1> Delays;
+typedef Delays Phases;
 
-    array<int16_t, 8> txcoeffs;
-    array<array<int16_t, YGROUPS>, XGROUPS> txdelays; 
+/// Taylor Coefficient Types
+typedef array<int16_t, 8> TxCoeffs;
+typedef array<int16_t, 10> RxCoeffs;
 
-};
 
 /**
  * \brief 
@@ -49,26 +37,45 @@ struct TxData {
  */
 class TXController {
 
+    /**
+     * \brief Construct a new TXController object
+     * 
+     */
     TXController() = default;
+
+    /**
+     * \brief Destroy the TXController object
+     * 
+     */
     ~TXController();
 
+    /**
+     * \brief 
+     * 
+     * \param focalpoint 
+     * \param beamoffset_s 
+     * \param resolution_ns 
+     * \return double 
+     */
     double CompressTaylor(const RectPoint& focalpoint, double beamoffset_s, double resolution_ns);
+    
+    /**
+     * \brief 
+     * 
+     */
     void UncompressTaylor();
+    
+    /**
+     * \brief 
+     * 
+     * \param groupdelay 
+     */
     void DelayUncompression(double groupdelay);
 
 private:
 
-    TxData data;
-
-};
-
-/**
- * \brief 
- * 
- */
-struct RxData {
-
-    array<int16_t, 10> rxcoeffs;
+    std::vector<Delays> txdelays;
+    TxCoeffs coeffs;
 
 };
 
@@ -80,27 +87,83 @@ struct DynRxData {
 
 };
 
-
 class RXController {
 
 public:
 
-    double CompressTaylor(RectPoint& focalpoint, double beanoffset_s, double resolution_ns);
+    /**
+     * \brief 
+     * 
+     * \param focalpoint 
+     * \param beanoffset_s 
+     * \param resolution_ns 
+     * \param csound 
+     * \return double 
+     */
+    double CompressTaylor(RectPoint& focalpoint, double beanoffset_s, double resolution_ns, double csound = 1520.0f);
+    /**
+     * \brief 
+     * 
+     */
     void UncompressTaylor();
 
+    /**
+     * \brief 
+     * 
+     * \param x_deg 
+     * \param y_deg 
+     * \param runtime 
+     * \return double 
+     */
     double CompressTaylorDyn(double x_deg, double y_deg, uint8_t runtime);
+    
+    /**
+     * \brief 
+     * 
+     */
     void UncompressTaylorDyn();
 
-    RxData& GetRxData();
+    /**
+     * \brief Get the Dyn Rx Data object
+     * 
+     * \return DynRxData& 
+     */
     DynRxData& GetDynRxData();
 
 private:
     
-    RxData data;
+    RxCoeffs coeffs;
     DynRxData dyndata;
+    vector<Delays> delays;
+    vector<Phases> phases;
 
-}
+};
+
+class Controller {
+
+public:
+
+    /**
+     * \brief Construct a new Controller object
+     * 
+     */
+    Controller();
+
+    /**
+     * \brief Destroy the Controller object
+     * 
+     */
+    ~Controller();
 
 
+
+private:
+
+    TXController tx;
+    RXController rx;
+    
+    
+
+};
 
 };
