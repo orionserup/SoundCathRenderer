@@ -1,11 +1,11 @@
 /**
  * \file Constants.hpp
  * \author Orion Serup (orionserup@gmail.com)
- * \brief 
+ * \brief Contains the Device Specific Physical and Logical Constants
  * \version 0.1
  * \date 01-28-2022
  * 
- * @copyright Copyright (c) 2022
+ * \copyright Copyright (c) 2022
  * 
  */
 
@@ -31,5 +31,6 @@
 #define GROUPELEMENTS 16
 
 #define TX_ELEMENTS 16
+#define RX_ELEMENTS 16
 
-#define SOUND_SPEED 1540
+#define SOUND_SPEED 1481.0f

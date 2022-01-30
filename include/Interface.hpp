@@ -5,7 +5,7 @@
  * \version 0.1
  * \date 01-28-2022
  * 
- * @copyright Copyright (c) 2022
+ * \copyright Copyright (c) 2022
  * 
  */
 
@@ -16,92 +16,126 @@
 #include <string>
 #include <array>
 
+#ifdef _WIN32
+
 /**
- * @brief  Type definition for the dll imported function for the asic call wrapper
- * @note   From Oldelft
- * @param  f_dllfunction:
- * @retval int: error code
+ * \brief  Type definition for the dll imported function for the asic call wrapper
+ * \note   From Oldelft
+ * \param  f_dllfunction:
+ * \retval int: error code
  */
 typedef int (_stdcall *f_dllfunction)(char *inString, char *outString);
+
+#endif
 
 namespace SoundCath {
 
 /**
- * @brief
- * @note
- * @retval None
+ * \brief 
+ * 
  */
-enum DriverError : uint32_t {
+enum Parameter : uint16_t {
 
-    OK = 0,                   //< No Error
-    FAILED = 1,               //<
-    PARAM = 1 << 1,           //<
-    PARAMSET = 1 << 2,        //<
-    STATUS = 1 << 3,          //<
-    USB_INIT = 1 << 4,        //<
-    USB_RECEIVE = 1 << 5,     //<
-    USB_SEND = 1 << 6,        //<
-    NOT_IMPLEMENTED = 1 << 7, //<
-    CRC = 1 << 8,             //<
-    FPGA = 1 << 9,            //<
-    SWINTERNAL = 1 << 10,     //<
-    ASICERROR = 1 << 16       //<
+
 
 };
 
 /**
- * @brief Gets the error Message Cooresponding with the Error
- */
-constexpr const char* GetDriverErrorMessage(DriverError CodedError) noexcept;
-
-/**
- * @brief  ASIC interfacer class
- * @note   A wrapper for the Oldeft API
+ * \brief  ASIC interfacer class
+ * \note   A wrapper for the Oldeft API
  */
 class Interface {
 
+public:
 
     /**
-     * @brief
-     * @note
-     * @retval
+     * \brief
+     * \note
+     * \retval
      */
     Interface();
 
     /**
-     * @brief
-     * @note
-     * @param  command:
-     * @retval
+     * \brief
+     * \note
+     * \param  command:
+     * \retval
      */
-    std::string Query(const std::string &command) const noexcept;
+    std::string& Query(const std::string &command) const noexcept;
 
     /**
-     * @brief  Recieves the repsonse from the buffer
-     * @note   Just a getter for the get outbuffer fiunction
-     * @retval string, the reponse
+     * \brief 
+     * 
+     * \param command
+     * \return DriverError 
      */
-    std::array<char, UINT16_MAX>& GetOutBuffer() { return outBuffer; }
+    void Send(const std::string& command) const noexcept;
+
+    /**
+     * \brief 
+     * 
+     * \param output
+     * \return DriverError 
+     */
+    void Recv(std::string& output) const noexcept;
+
+    /**
+     * \brief 
+     * 
+     * \return DriverError 
+     */
+    void Recv();
+
 
     /**
      * \brief Get the Out String object
      * 
      * \return std::string& 
      */
-    std::string& GetOutString() { return std::string(outBuffer.data()); }
+    char* GetOutString() { return outbuffer; }
 
     /**
-     * @brief
-     * @note
-     * @retval
+     * \brief Set the Parameter object
+     * 
      */
-    ~Interface();
+    void SetParameter();
+
+    /**
+    * \brief Error Codes for the Driver Interface
+    */
+    enum Error : uint32_t {
+
+        FAILED = 1,               ///< The Command Failed
+        PARAM = 1 << 1,           ///< Bad Paramaters
+        PARAMSET = 1 << 2,        ///< Bad Parameter Sets
+        STATUS = 1 << 3,          ///< Driver is in a Bad State
+        USB_INIT = 1 << 4,        ///< The USB Wasn't Initialized
+        USB_RECEIVE = 1 << 5,     ///< The USB Recieved Bad Data
+        USB_SEND = 1 << 6,        ///< The USB Didn't Send Correctly
+        NOT_IMPLEMENTED = 1 << 7, ///< The Functionality is Not Implemented
+        CRC = 1 << 8,             ///< CRC Detected a Data Error
+        FPGAERROR = 1 << 9,       ///< There was an Error in the FPGA
+        SWINTERNAL = 1 << 10,     ///< There was an Internal Error
+        ASICERROR = 1 << 16       ///< There was an error in the ASIC
+
+    };
+
+    /**
+     * \brief Get the Error Message object
+     * 
+     * \param error
+     * \return constexpr const char* 
+     */
+    static constexpr const char* GetErrorMessage(Error error) noexcept;
 
 private:
 
+    #ifdef _WIN32
     f_dllfunction asic_call_parse;  //< Function pointer from the DLL
-    HINSTANCE dll;                  //< DLL Handle
+    HINSTANCE dll;
+    #endif                  //< DLL Handle
 
-    std::array<char, UINT16_MAX> outBuffer;     //< Data Buffer For the output data, 65kB wide
+    char outbuffer[UINT16_MAX];     //< Data Buffer For the output data, 65kB wide
 };
+
 }

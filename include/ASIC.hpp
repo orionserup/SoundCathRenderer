@@ -1,83 +1,73 @@
 /**
  * \file ASIC.hpp
  * \author Orion Serup (orionserup@gmail.com)
- * \brief 
+ * \brief Contains the ASIC Specific Functionality Definition
  * \version 0.1
  * \date 01-28-2022
  * 
- * @copyright Copyright (c) 2022
+ * \copyright Copyright (c) 2022
  * 
  */
 
 #pragma once 
 
 #include "Interface.hpp"
-#include "Controller.hpp"
+#include "Constants.hpp"
 
 #include <string>
 
 using std::string;
+using std::array;
 
 /**
- * @brief SoundCath Name Space for internal functionality
+ * \brief SoundCath Name Space for internal functionality
  */
 namespace SoundCath {
 
+/// Delay Values for a Group
+typedef array<int8_t, GROUPELEMENTS> GroupDelays;
+
+/// Delays for the Whole Transducer Array
+typedef array<array<GroupDelays, YGROUPS>, XGROUPS + 1> Delays;
+
+/// Phase Offsets 
+typedef Delays Phases;
+
+// Taylor Coefficient Types
+/// Taylor Transmission Coefficients
+typedef array<int16_t, 8> TxCoeffs;
+
+/// Taylor Receiving Coefficients
+typedef array<int16_t, 10> RxCoeffs;
+
+// Easy Use Types
+/// Represents A Group on the ASIC
+typedef uint8_t Group;
+
+/// Represent An Element in the Group
+typedef uint8_t Elem;
+
+/// Element Typedef between [0..1023]
+typedef struct { Group group: 6; Elem loc: 4; } Element;
+
 /**
- * \brief 
- * 
+ * \brief Gets the Physical Location/Index of an Element with regards to its logical location
+ * \note Evaluated at Compile Time
+ * \param group: The Logical Group
+ * \param loc: The logical Element within the group
+ * \return Element: The Actual Physical Location
  */
-enum ASICError : uint8_t {
-
-    OK = 0,                 ///< No Error
-    UNKNOWN_CMD = 1 << 0,   ///< Unknown Command
-    VALID_ERROR = 1 << 1 ,  ///< A Random Error
-    CHKSUM_ERROR = 1 << 2,  ///< A Checksum Error
-    BUSY = 1 << 3,          ///< The ASIC is Busy
-    LOCKED = 1 << 6,        ///< The ASIC is Locked
-    EXTERNAL = 1 << 7       ///< An External Error Occured
-
-};
+constexpr const Element LookupElement(const Group group, const Elem loc) noexcept;
 
 /**
- * \brief 
- * 
- * \param code 
- * \return constexpr const char* 
- */
-constexpr const char* GetASICErrorMessage(const ASICError code) {
-
-    switch (code) {
-
-        case OK:
-            return "No Error Occurred";
-        case UNKNOWN_CMD:
-            return "Unknown Command Sent";
-        case VALID_ERROR:
-            return "Invalid Data Sent";
-        case CHKSUM_ERROR:
-            return "Checksum Error";
-        case BUSY:
-            return "ASIC is Busy Try Again Later";
-        case LOCKED:
-            return "ASIC is in a Locked State";
-        case EXTERNAL:
-            return "External Error Detected";
-        default:
-            return "Unknown Error Detected";
-    }
-
-}
-
-/**
- * @brief Container Class for the ASIC functionality
+ * \brief Container Class for the ASIC functionality
  */
 class ASIC {
 
 public:
 
     /**
-     * @brief Enum for the clock speed of the ASIC, Either Low: 25MHz, or High: 100MHz
+     * \brief Enum for the clock speed of the ASIC, Either Low: 25MHz, or High: 100MHz
      */
     enum ClkSpeed : uint8_t {
 
@@ -87,75 +77,60 @@ public:
     };
 
     /**
-     * @brief Mode for the ASIC
+     * \brief 
+     * 
      */
-    enum Mode : uint8_t {
+    enum BModeSetting : bool {
 
-        CW, ///< Continuous Mode
-        NORMAL,
-        BMODE
+        DELAYS = 0, ///< Send the Element Delays
+        COEFFS = 1  ///< Send the Compression Coefficient
 
     };
 
     /**
-     * @brief  
-     * @note   
-     * @param  driver: 
-     * @param  speed: 
-     * @retval 
+     * \brief  
+     * \note   
+     * \param  driver: 
+     * \param  speed: 
+     * \retval 
      */
-    ASIC(const Interface& driver, ClkSpeed speed = LOW, Mode mode = NORMAL);
-
-    /**
-     * @brief Gets the Serial Number from the ASIC
-     * @note Uses Default Serial Number call
-     * @retval string, the serial number in a string form
-     */
-    std::string GetSerialNum();
-
-    /**
-     * @brief  
-     * @note   
-     * @param  channel: 
-     * @retval 
-     */
-    double GetOutputCapacitance(const uint8_t channel) const;
-
-    /**
-     * @brief  
-     * @note   
-     * @retval 
-     */
-    double GetBandGapV() const;
-
-    /**
-     * @brief  
-     * @note   
-     * @retval 
-     */
-    bool RunTests() const;
+    ASIC(const Interface& driver, ClkSpeed speed = LOW);
 
     /**
      * \brief Get the Error object
      * 
      * \return ASICError 
      */
-    ASICError GetError();
+    void GetError();
+
+    // ------------------------- Fire Commands ---------------------- //
 
     /**
-     * \brief Set the Elem Delays object
+     * \brief 
      * 
-     * \param delays 
-     * \return ASICError 
+     * \param delays
      */
     void Fire(const Delays& delays);
+
+    /**
+     * \brief 
+     * 
+     * \param group
+     * \param tx
+     * \param rx
+     */
+    void Fire(const Group group, const Delays& tx, const GroupDelays& rx);
     
+    // --------------------- Fire Element Commands ----------------- //
+
     /**
      * \brief 
      * 
      * \param elem 
      */
-    void FireSingle(const uint16_t elem);
+    void FireElement(const Element elem);
+
+    // ------------------------ Fire Group Commands ---------------- //
 
     /**
      * \brief Set the Group Delay object
@@ -164,7 +139,70 @@ public:
      * \param delay 
      * \return ASICError 
      */
-    void FireGroup(const uint8_t group, const GroupDelays& delay);
+    void FireGroup(const Group group, const GroupDelays& tx);
+
+    /**
+     * \brief 
+     * 
+     * \param group
+     * \param tx
+     * \param rx
+     */
+    void FireGroup(const Group group, const GroupDelays& tx, const GroupDelays& rx);
+
+    /**
+     * \brief 
+     * 
+     * \param group
+     * \param tx
+     * \param rx
+     * \param output
+     */
+    void FireGroup(const Group group, const GroupDelays& tx, const GroupDelays& rx, const Group output);
+
+    /**
+     * \brief 
+     * 
+     * \param group
+     * \param tx
+     * \param rx
+     * \param rxphases
+     */
+    void FireGroup(const Group group, const GroupDelays& tx, const GroupDelays& rx, const Phases& rxphases);
+
+    // ----------------------- Recieving Commands ---------------------- //
+
+    /**
+     * \brief 
+     * 
+     * \param delays
+     */
+    void ReadTXDelays(Delays& delays);
+
+    /**
+     * \brief 
+     * 
+     * \param delays
+     */
+    void ReadRXDelays(Delays& delays);
+
+    /**
+     * \brief 
+     * 
+     * \param coeffs
+     */
+    void ReadRXCoeffs(RxCoeffs& coeffs);
+
+    /**
+     * \brief 
+     * 
+     * \param group
+     * \param elem
+     * \param channe1
+     */
+    void RecvElement(const Element elem);
+
+    // -------------------------- Utility Functions ------------------------ //
 
     /**
      * \brief Get the Group Capacitance object
@@ -172,27 +210,81 @@ public:
      * \param group 
      * \return array<float, GROUPELEMENTS>& 
      */
-    array<float, GROUPELEMENTS>& GetGroupCapacitance(const uint8_t group);
+    array<float, GROUPELEMENTS> GetGroupCapacitance(const uint8_t group);
     
     /**
      * \brief Get the Element Capaitance object
      * 
-     * \param elem 
+     * \param element
      * \return float 
      */
-    float GetElementCapaitance(const uint16_t elem);
+    float GetElementCapacitance(const Element element);
 
+    /**
+     * \brief Gets the Serial Number from the ASIC
+     * \note Uses Default Serial Number call
+     * \retval string, the serial number in a string form
+     */
+    std::string GetSerialNum();
+
+    /**
+     * \brief  
+     * \note   
+     * \retval 
+     */
+    double GetBandGapV() const;
+
+    /**
+     * \brief  
+     * \note   
+     * \retval 
+     */
+    bool RunTests() const;
+
+    /**
+     * \brief Error Codes that are For the ASIC
+     * 
+     */
+    enum Error : uint8_t {
+
+        UNKNOWN_CMD = 1 << 0,   ///< Unknown Command
+        VALID_ERROR = 1 << 1 ,  ///< A Random Error
+        CHKSUM_ERROR = 1 << 2,  ///< A Checksum Error
+        BUSY = 1 << 3,          ///< The ASIC is Busy
+        LOCKED = 1 << 6,        ///< The ASIC is Locked
+        EXTERNAL = 1 << 7       ///< An External Error Occured
+
+    };
+
+    /**
+     * \brief Gets the Error Code Message According to the Error Code
+     * \note Is Evaluated at Compile time
+     * \param code: The Error Code
+     * \return const char*: The String Associated with the Error Code 
+     */
+    static constexpr const char* GetErrorMessage(const Error code) noexcept;
 
 private:
+
+    /**
+     * \brief 
+     * 
+     * \param setting
+     * \return ASICError 
+     */
+    void BModeInit(BModeSetting setting);
+    
+    /**
+     * \brief 
+     * 
+     * \return ASICError 
+     */
+    void CWModeInit();
 
     Interface& driver; ///< An Instance of the wrapper for the Oldelft API
 
     ClkSpeed speed;    ///< The ASIC Clock Speed
-    Mode mode;         ///< The ASIC operation Mode
     string serialnum;  ///< The Serial Number
-    array<float, GROUPELEMENTS> capacitance_pf;   ///< Element Capacitance
-
-    ASICError errorcode; ///< Any Time an Operation is done It fills this value
 
 };
 

@@ -374,3 +374,7 @@ CMakeCache.txt
 *.json
 *.ninja*
 Makefile
+
+html/
+latex/
+*.a

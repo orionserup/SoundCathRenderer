@@ -15,20 +15,13 @@
 
 #include "Point.hpp"
 #include "Constants.hpp"
-
-namespace SoundCath {
+#include "ASIC.hpp"
+#include "FPGA.hpp"
 
 using std::array;
 using std::vector;
 
-/// Group Delay Types
-typedef array<int16_t, GROUPELEMENTS> GroupDelays;
-typedef array<array<GroupDelays, YGROUPS>, XGROUPS + 1> Delays;
-typedef Delays Phases;
-
-/// Taylor Coefficient Types
-typedef array<int16_t, 8> TxCoeffs;
-typedef array<int16_t, 10> RxCoeffs;
+namespace SoundCath {
 
 
 /**
@@ -36,18 +29,6 @@ typedef array<int16_t, 10> RxCoeffs;
  * 
  */
 class TXController {
-
-    /**
-     * \brief Construct a new TXController object
-     * 
-     */
-    TXController() = default;
-
-    /**
-     * \brief Destroy the TXController object
-     * 
-     */
-    ~TXController();
 
     /**
      * \brief 
@@ -101,6 +82,7 @@ public:
      * \return double 
      */
     double CompressTaylor(RectPoint& focalpoint, double beanoffset_s, double resolution_ns, double csound = 1520.0f);
+
     /**
      * \brief 
      * 
@@ -147,6 +129,12 @@ public:
      * \brief Construct a new Controller object
      * 
      */
+    Controller(const Interface& face);
+
+    /**
+     * \brief Construct a new Controller object
+     * 
+     */
     Controller();
 
     /**
@@ -159,11 +147,14 @@ public:
 
 private:
 
+    Interface face;
+
     TXController tx;
     RXController rx;
     
+    ASIC asic;
+    FPGA fpga;
     
-
 };
 
-};
+}
