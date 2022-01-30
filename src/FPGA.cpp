@@ -1,7 +1,7 @@
 /**
  * \file FPGA.cpp
  * \author Orion Serup (orionserup@gmail.com)
- * \brief 
+ * \brief Contains the Implementation of the 
  * \version 0.1
  * \date 01-28-2022
  * 

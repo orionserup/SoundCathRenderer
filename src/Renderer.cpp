@@ -1,7 +1,7 @@
 /**
  * \file Renderer.cpp
  * \author Orion Serup (orionserup@gmail.com)
- * \brief 
+ * \brief Contains the Implementation of the Renderer Module
  * \version 0.1
  * \date 01-28-2022
  * 

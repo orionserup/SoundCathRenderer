@@ -1,7 +1,7 @@
 /**
  * \file main.cpp
  * \author Orion Serup (orionserup@gmail.com)
- * \brief 
+ * \brief Contains the Main Function
  * \version 0.1
  * \date 01-28-2022
  * 
@@ -15,13 +15,13 @@
 using namespace SoundCath;
 
 /**
- * \brief 
+ * \brief The Program Entry Point
  * 
- * \param argc
- * \param kwargs
- * \return int 
+ * \param argc: The Number of Arguments
+ * \param kwargs: The Actual Arguments
+ * \return int: The Status of the Program on Exit
  */
-int main(int argc, char** kwargs) {
+int main(int argc, const char** kwargs) {
 
 	Controller cont; 
 
@@ -33,5 +33,5 @@ int main(int argc, char** kwargs) {
 	gui.SetFPS(30);
 
 
-	return EXIT_FAILURE;
+	return EXIT_SUCCESS;
 }

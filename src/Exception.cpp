@@ -16,9 +16,9 @@ using namespace SoundCath;
 /**
  * \brief Gets the error Message Cooresponding with the Error at compile time
  */
-constexpr const char* GetDriverErrorMessage(DriverError CodedError) noexcept{
+constexpr const char* GetErrorMessage(Interface::Error error) noexcept{
 
-    switch (CodedError) {
+    switch (error) {
 
     case FAILED:
         return "Operation Failed \n";

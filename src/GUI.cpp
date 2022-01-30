@@ -1,7 +1,7 @@
 /**
  * \file GUI.cpp
  * \author Orion Serup (orionserup@gmail.com)
- * \brief 
+ * \brief Contains the Implementation of the GUI
  * \version 0.1
  * \date 2022-01-28
  * 

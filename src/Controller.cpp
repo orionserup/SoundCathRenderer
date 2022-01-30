@@ -1,7 +1,7 @@
 /**
  * \file Controller.cpp
  * \author Orion Serup (orionserup@gmail.com)
- * \brief 
+ * \brief Contains the Implementation of the ASIC and FPGA Controller
  * \version 0.1
  * \date 01-28-2022
  * 
@@ -14,7 +14,6 @@
 using namespace SoundCath;
 
 Controller::Controller(const Interface& face): asic(face), fpga(face) {}
-
 
 Controller::Controller(): face(), asic(face), fpga(face) {}
 

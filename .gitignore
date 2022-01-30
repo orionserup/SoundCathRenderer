@@ -378,3 +378,5 @@ Makefile
 html/
 latex/
 *.a
+*.in
+Doxyfile.*

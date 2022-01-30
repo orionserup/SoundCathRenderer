@@ -1,23 +1,26 @@
 cmake_minimum_required( VERSION 3.10 )
 
-project(SoundCathRenderer LANGUAGES CXX VERSION 0.1)
+project(SoundCathRenderer 
+        LANGUAGES CXX 
+        VERSION 0.1
+        DESCRIPTION "A Real Time UltraSound Rendering and Visualization Platform")
 
 find_package(Eigen3 3.4 REQUIRED NO_MODULE)
 
 find_package(VTK COMPONENTS
-    vtkCommonColor
-    vtkCommonCore
-    vtkCommonDataModel
-    vtkFiltersCore
-    vtkFiltersSources
-    vtkIOXML
-    vtkImagingHybrid
-    vtkInteractionStyle
-    vtkRenderingContextOpenGL2
-    vtkRenderingCore
-    vtkRenderingFreeType
-    vtkRenderingGL2PSOpenGL2
-    vtkRenderingOpenGL2
+    CommonColor
+    CommonCore
+    CommonDataModel
+    FiltersCore
+    FiltersSources
+    IOXML
+    ImagingHybrid
+    InteractionStyle
+    RenderingContextOpenGL2
+    RenderingCore
+    RenderingFreeType
+    RenderingGL2PSOpenGL2
+    RenderingOpenGL2
 )
 
 set(CMAKE_CXX_STANDARD 17)
@@ -40,6 +43,7 @@ set(CMAKE_EXE_LINKER_FLAGS "-flto")
 endif()
 
 file(GLOB SOURCES ../src/*[!main].cpp)
+file(GLOB INCLUDES ../include/*.h*)
 add_library(UltraSound STATIC ${SOURCES})
 target_include_directories(UltraSound PUBLIC ../include )
 
@@ -51,12 +55,33 @@ vtk_module_autoinit(TARGETS UltraSound
                     MODULES ${VTK_LIBRARIES})
 
 add_executable(${PROJECT_NAME} ../src/main.cpp)
-target_include_directories(${PROJECT_NAME} PUBLIC ../include)
+target_include_directories(${PROJECT_NAME} PUBLIC ../include ${VTK_USE_FILE})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ../bin)   
 
 target_link_libraries(UltraSound ${VTK_LIBRARIES} Eigen3::Eigen)
 target_link_libraries(${PROJECT_NAME} UltraSound)
+
+option(BUILD_DOCS "Generate HTML and PDF Referance Manuals (Requires Doxygen)" ${DOXYGEN_FOUND})
+if(BUILD_DOCS)
+    find_package(Doxygen REQUIRED dot)
+    if(NOT DOXYGEN_FOUND)
+        message(FATAL_ERROR "You Need Doxygen To Build the Docs")
+    endif()
+    
+    set(DOXYGEN_PROJECT_NAME ${PROJECT_NAME})
+    set(DOXYGEN_PROJECT_BRIEF ${PROJECT_DESCRIPTION})
+    
+    set(DOXYGEN_OUTPUT_DIRECTORY ../docs)
+
+    set(DOXYGEN_GENERATE_HTML YES)
+    set(DOXYGEN_GENERATE_LATEX YES)
+
+    doxygen_add_docs(docs
+        "${INCLUDES} ${SOURCES}"
+        WORKING_DIRECTORY ../docs)
+
+endif()
 
 install(TARGETS UltraSound DESTINATION ${CMAKE_INSTALL_LIBRARY_PATH})
