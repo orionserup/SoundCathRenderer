@@ -380,3 +380,4 @@ latex/
 *.a
 *.in
 Doxyfile.*
+Testing/
