@@ -1,0 +1,4 @@
+<map id="SoundCath::Interface::Query" name="SoundCath::Interface::Query">
+<area shape="rect" id="node1" title="Queries the Oldelft API and returns the response as a string." alt="" coords="5,5,148,47"/>
+<area shape="rect" id="node2" href="$namespace_sound_cath.html#afaa76825c75a93e9a1eb6943f7033ec4" title="Gets the error Message Cooresponding with the Error." alt="" coords="196,5,371,47"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="SoundCath::GetDriverErrorMessage" name="SoundCath::GetDriverErrorMessage">
+<area shape="rect" id="node1" title="Gets the error Message Cooresponding with the Error." alt="" coords="196,5,371,47"/>
+<area shape="rect" id="node2" href="$class_sound_cath_1_1_interface.html#ac74980b6eef4a4a93ac0fe4f9ad0a43f" title="Queries the Oldelft API and returns the response as a string." alt="" coords="5,5,148,47"/>
+</map>
