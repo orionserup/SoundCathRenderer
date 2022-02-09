@@ -26,6 +26,23 @@ class FPGA {
 
 public:
 
+    class Config {
+
+    public:
+
+        /**
+         * \brief Construct a new Config object
+         * 
+         */
+        Config();
+
+
+    private:
+
+
+
+    };
+
     /**
      * \brief Construct a new FPGA object
      * 
@@ -77,9 +94,9 @@ public:
 
 private:
 
-    Interface& face;
-    string version;
-    string desc;
+    Interface& face;    ///< The Physical Interface that is Connected to the FPGA
+    string version;     ///< The HDL Version
+    string desc;        ///< Physical Description
 
 };
 

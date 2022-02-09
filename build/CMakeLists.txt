@@ -49,6 +49,8 @@ endif()
 file(GLOB SOURCES ../src/*[!main].cpp)
 file(GLOB INCLUDES ../include/*.h*)
 
+file(GLOB TESTFILES ../test/*/*.hpp ../test/*/*.cpp)
+
 #------------------- Compile Targets --------------------- #
 
 add_library(UltraSound STATIC ${SOURCES})
@@ -75,7 +77,9 @@ install(TARGETS UltraSound DESTINATION ${CMAKE_INSTALL_LIBRARY_PATH})
 # ------------- Documentation Generation ------------------ #
 
 option(BUILD_DOCS "Generate HTML and PDF Referance Manuals (Requires Doxygen)" ${DOXYGEN_FOUND})
+
 if(BUILD_DOCS)
+
     find_package(Doxygen REQUIRED dot)
     if(NOT DOXYGEN_FOUND)
         message(FATAL_ERROR "You Need Doxygen To Build the Docs")
@@ -90,7 +94,7 @@ if(BUILD_DOCS)
     set(DOXYGEN_GENERATE_LATEX YES)
 
     doxygen_add_docs(docs
-        "${INCLUDES} ${SOURCES}"
+        "${INCLUDES} ${SOURCES} ${TESTFILES}"
         WORKING_DIRECTORY ../docs)
 
 endif()
@@ -99,7 +103,6 @@ endif()
 
 option(ENABLE_TESTING "Create A Target That Tests the Software")
 if(ENABLE_TESTING)
-    add_subdirectory(../test)
+    add_subdirectory(../test ../test)
 endif()
-
 

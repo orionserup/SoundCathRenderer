@@ -381,3 +381,5 @@ latex/
 *.in
 Doxyfile.*
 Testing/
+*.tcl
+*.docs

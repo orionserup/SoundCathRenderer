@@ -3,22 +3,27 @@
  * \author Orion Serup (orionserup@gmail.com)
  * \brief 
  * \version 0.1
- * \date 2022-01-31
+ * \date 02-08-2022
  * 
  * @copyright Copyright (c) 2022
  * 
  */
 
-#pragma once
+class ControllerTester {
 
-#include "ASIC.hpp"
 
-namespace SoundCath {
-
-class ASICTester {
 
 
 };
 
+class RXControllerTester {
 
-}
+
+
+};
+
+class TXControllerTester {
+
+
+
+};

@@ -11,9 +11,11 @@ This Project is a real time renderer for Oldelft Ultrasound Boxes and Catheters.
 
 ## Dependencies
 
-### [Eigen](https://gitlab.com/libeigen/eigen.git)
+### [Eigen](https://gitlab.com/libeigen/eigen.git) For the Linear Algebra
 
-### [VTK](https://gitlab.kitware.com/vtk/vtk)
+### [VTK](https://gitlab.kitware.com/vtk/vtk) For the Rendering and Visualization
+
+### [Doxygen](https://www.doxygen.nl) For Documentation Generation
 
 
 ## Build Guide

@@ -10,13 +10,15 @@
  */
 
 #include "Interface.hpp"
+#include "Exception.hpp"
+
 #include <iostream>
 
 using namespace SoundCath;
 
 #ifdef _WIN32
 
-Interface::Interface() {
+Interface::Interface(): outbuffer(new char[UINT16_MAX]) {
 
 	this->dll = LoadLibrary("../lib/asic_call_wrapper_dll64");
 		if (!this->dll) 
@@ -28,20 +30,21 @@ Interface::Interface() {
 
 }
 
-std::string Interface::Query(const std::string& command) const noexcept {
+std::string Interface::Query(char* command) const {
 
-	int result = asic_call_parse((char*)command.c_str(), (char*)outBuffer.data());
+	int result = asic_call_parse(command, outbuffer.get());
 		
     if (!result)
-		std::cerr << "\tError!! " << GetDriverErrorMessage((DriverError)result);
+		throw DriverException((Error)result);
 
-    return std::string((char*)outBuffer.data());
+    return std::string(outbuffer.get());
 
 }
 
 Interface::~Interface() {
 
 	FreeLibrary(this->dll);
+    outbuffer.release();
 
 }
 
@@ -83,3 +86,4 @@ constexpr const char* Interface::GetErrorMessage(Error error) noexcept{
 
     }
 }
+

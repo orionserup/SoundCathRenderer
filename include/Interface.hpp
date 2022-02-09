@@ -12,9 +12,11 @@
 #pragma once
 
 #include "asic_call_wrapper_dll.h"
+
 #include <cstdint>
 #include <string>
 #include <array>
+#include <memory>
 
 #ifdef _WIN32
 
@@ -47,6 +49,28 @@ enum Parameter : uint16_t {
 class Interface {
 
 public:
+
+    /**
+     * \brief 
+     * 
+     */
+    class Config {
+
+    public:
+
+        /**
+         * \brief Construct a new Config object
+         * 
+         */
+        Config();
+
+
+
+    private:
+
+
+
+    };
 
     /**
      * \brief
@@ -92,7 +116,7 @@ public:
      * 
      * \return std::string& 
      */
-    char* GetOutString() { return outbuffer; }
+    char* GetOutString() { return outbuffer.get(); }
 
     /**
      * \brief Set the Parameter object
@@ -126,16 +150,17 @@ public:
      * \param error
      * \return constexpr const char* 
      */
-    static constexpr const char* GetErrorMessage(Error error) noexcept;
+    static inline constexpr const char* GetErrorMessage(Error error) noexcept;
 
 private:
 
     #ifdef _WIN32
-    f_dllfunction asic_call_parse;  //< Function pointer from the DLL
-    HINSTANCE dll;
-    #endif                  //< DLL Handle
+    f_dllfunction asic_call_parse;      ///< Function pointer from the DLL
+    HINSTANCE dll;                      ///< Function Handle for the DLL
+    #endif                              ///< DLL Handle
 
-    char outbuffer[UINT16_MAX];     //< Data Buffer For the output data, 65kB wide
+    std::unique_ptr<char> outbuffer;    ///< Data Buffer For the output data, 65kB wide
+
 };
 
 }

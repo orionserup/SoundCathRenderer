@@ -67,34 +67,179 @@ class ASIC {
 public:
 
     /**
-     * \brief Enum for the clock speed of the ASIC, Either Low: 25MHz, or High: 100MHz
-     */
-    enum ClkSpeed : uint8_t {
-
-        LOW = 25,  ///< 25MHz
-        HIGH = 100 ///< 100MHz
-
-    };
-
-    /**
      * \brief 
      * 
      */
-    enum BModeSetting : bool {
+    class Config {
 
-        DELAYS = 0, ///< Send the Element Delays
-        COEFFS = 1  ///< Send the Compression Coefficient
+    public:
+
+        /**
+         * \brief Construct a new Config object
+         * \note Fills with the Default Values
+         */
+        Config();   
+
+        /**
+         * \brief Construct a new Config object
+         * 
+         * \param config 
+         */
+        Config(const Config& config);
+
+        /**
+         * \brief Enum for the clock speed of the ASIC, Either Low: 25MHz, or High: 100MHz
+         */
+        enum ClkSpeed : uint8_t {
+
+            LOW = 25,  ///< 25MHz
+            HIGH = 100 ///< 100MHz
+
+        };
+
+        /**
+         * \brief Set the Clock Speed object
+         * 
+         * \param speed 
+         */
+        void SetClockSpeed(const ClkSpeed speed);
+
+        /**
+        * \brief 
+        * 
+        */
+        struct Pulse {
+
+            enum PulseSubType: uint8_t {
+
+                FIFTY_GAIN8 = 0,        ///< 50 ns Pulse Gain of 8
+                HUNDRED_GAIN8 = 1,      ///< 100ns Pulse Gain of 8
+                FIFTY_GAIN2 = 2,        ///< 50ns Pulse Gain of 2
+                FIFTY_GAIN0 = 3,        ///< 50ns Pulse Gain of 0
+                HUNDRED_GAIN0 = 4,      ///< 100ns Pulse Gain of 0
+                DARK_GAIN8 = 5,         ///< Dark Pulse Gain of 8
+                FIFTY_GAIN1 = 6,        ///< 50ns Pulse Gain of 1
+                DARK_GAIN0 = 7,         ///< Dark Pulse Gain of 0
+                TW_FIVE_GAIN8 = 8,      ///< 25ns Pulse Gain of 8
+                FIFTY_NEG_GAIN8 = 9,    ///< 50ns Negative Pulse Gain of 8
+                DARK_NEG_GAIN8 = 10,    ///< Dark Negative Pulse Gain of 8
+                HUNDRED_NEG_GAIN8 = 11  ///< 100ns Negative Pulse Gain of 8
+
+            };
+
+            /**
+            * \brief 
+            * 
+            */
+            enum PulseType: uint8_t {
+
+                UNIPOLAR = 0    ///< One Peak
+
+            };
+
+            PulseType type;         ///< The Shape of the Pulse
+            PulseSubType subtype;   ///< The Length and Gain
+
+        };
+
+        /**
+         * \brief Set the Pulse object
+         * 
+         * \param pulse 
+         */
+        void SetPulse(const Pulse pulse);
+
+        /**
+         * \brief 
+         * 
+         */
+        struct BeamTiming {
+
+            double SetupTime;       ///<           
+            double RunRxTime;       ///<
+            double RunTXTime;       ///<
+            double StopTXTime;      ///<
+            double StopRXTime;      ///<
+            double AnaResetStopTime;///<
+            double PreChargeTime;   ///<
+        
+        };
+
+        /**
+         * \brief Set the Beam Timing object
+         * 
+         * \param timing 
+         */
+        void SetBeamTiming(const BeamTiming timing);
+
+        /**
+         * \brief 
+         * 
+         */
+        struct DRVConfig {
+
+            bool Enable;    ///< If DRV is Enabled
+            bool FFen;      ///<
+            double Bias;    ///<
+
+        };
+
+        /**
+         * \brief 
+         * 
+         * \param config 
+         */
+        void SetDRVConfig(const DRVConfig& config);
+
+        /**
+         * \brief 
+         * 
+         */
+        enum BModeSetting : bool {
+
+            DELAYS = 0, ///< Send the Element Delays
+            COEFFS = 1  ///< Send the Compression Coefficient
+
+        };
+
+        /**
+         * \brief 
+         * 
+         * \param bmodesetting 
+         */
+        void SetBModeSetting(const BModeSetting& bmodesetting);
+
+    private:
+
+        BModeSetting bmodesetting;  ///< uBeanforming Settings 
+        Pulse pulse;                ///< Pulse Configuration 
+        ClkSpeed speed;             ///< ASIC Clock Speed
+        DRVConfig drvconfig;        ///< DRV Configuration
 
     };
 
     /**
      * \brief  
      * \note   
-     * \param  driver: 
-     * \param  speed: 
+     * \param  config
      * \retval 
      */
-    ASIC(const Interface& driver, ClkSpeed speed = LOW);
+    ASIC(const Interface& driver);
+
+    /**
+     * \brief Construct a new ASIC object
+     * 
+     * \param driver 
+     * \param config 
+     */
+    ASIC(const Interface& driver, const Config& config);
+
+    /**
+     * \brief Set the Config object
+     * 
+     * \param config 
+     */
+    void SetConfig(const Config& config);
 
     /**
      * \brief Get the Error object
@@ -208,9 +353,10 @@ public:
      * \brief Get the Group Capacitance object
      * 
      * \param group 
-     * \return array<float, GROUPELEMENTS>& 
+     * \param cap_pf
+     * \return void
      */
-    array<float, GROUPELEMENTS> GetGroupCapacitance(const uint8_t group);
+    void GetGroupCapacitance(const uint8_t group, array<double, GROUPELEMENTS>& cap_pf);
     
     /**
      * \brief Get the Element Capaitance object
@@ -266,24 +412,7 @@ public:
 
 private:
 
-    /**
-     * \brief 
-     * 
-     * \param setting
-     * \return ASICError 
-     */
-    void BModeInit(BModeSetting setting);
-    
-    /**
-     * \brief 
-     * 
-     * \return ASICError 
-     */
-    void CWModeInit();
-
     Interface& driver; ///< An Instance of the wrapper for the Oldelft API
-
-    ClkSpeed speed;    ///< The ASIC Clock Speed
     string serialnum;  ///< The Serial Number
 
 };

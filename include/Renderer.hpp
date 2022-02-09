@@ -101,8 +101,6 @@ private:
 
     string filename;                    ///< What File to Save it to If Any
 
-    int16_t pointid;                    ///< Current Point ID
-
 };
 
 }

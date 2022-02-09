@@ -1,24 +1,12 @@
 /**
- * \file Test.hpp
+ * \file Test.cpp
  * \author Orion Serup (orionserup@gmail.com)
  * \brief 
  * \version 0.1
- * \date 2022-01-31
+ * \date 02-08-2022
  * 
  * @copyright Copyright (c) 2022
  * 
  */
 
-#pragma once
-
-#include "ASIC.hpp"
-
-namespace SoundCath {
-
-class ASICTester {
-
-
-};
-
-
-}
+#include "Test.hpp"

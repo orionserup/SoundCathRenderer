@@ -14,7 +14,7 @@
 #include <vtkRenderer.h>
 #include <vtkNew.h>
 
-#include <cstdint>
+
 
 using namespace SoundCath;
 
