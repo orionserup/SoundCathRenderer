@@ -11,9 +11,46 @@
 
 #include "Controller.hpp"
 
-using namespace SoundCath;
 
-Controller::Controller(const Interface& face): asic(face), fpga(face) {}
+using SoundCath::Controller;
+using SoundCath::RXController;
+using SoundCath::TXController;
 
-Controller::Controller(): face(), asic(face), fpga(face) {}
+#ifdef USEGPU
+
+#else
+
+double RXController::CompressTaylor(const RectPoint& focalpoint, const double beamoffset_s, const double resolution_ns) {
+
+
+    return 0.0f;
+
+}
+
+void RXController::UncompressTaylor() {
+
+
+}
+
+void RXController::PreCalcRxDelays() {
+
+
+}
+
+void RXController::UncompressTaylorDyn() {
+
+
+}
+
+double RXController::CompressTaylorDyn(const double x_deg, const double y_deg, const uint8_t runtime) {
+
+
+    return 0.0f;
+
+}
+
+#endif
+
+
+
 

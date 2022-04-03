@@ -3,11 +3,14 @@
  * \author Orion Serup (orionserup@gmail.com)
  * \brief 
  * \version 0.1
- * \date 2022-01-31
+ * \date 2022-04-02
  * 
  * @copyright Copyright (c) 2022
  * 
  */
+
+//#include "main.hpp"
+#include "Controller.hpp"
 
 /**
  * \brief 
@@ -16,9 +19,9 @@
  * \param kwargs
  * \return int 
  */
-int main(int argc, const char** kwargs) {
+int main(const int argc, const char* const* const kwargs) {
 
 
-    return 0;
+    return 1;
 
 }

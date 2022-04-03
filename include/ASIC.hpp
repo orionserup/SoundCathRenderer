@@ -13,32 +13,35 @@
 
 #include "Interface.hpp"
 #include "Constants.hpp"
+#include "Parameters.hpp"
+
+#include <Eigen/Dense>
 
 #include <string>
 
 using std::string;
 using std::array;
 
-/**
- * \brief SoundCath Name Space for internal functionality
- */
 namespace SoundCath {
 
+using Eigen::Vector;
+using Eigen::Matrix;
+
 /// Delay Values for a Group
-typedef array<int8_t, GROUPELEMENTS> GroupDelays;
+typedef Vector<int8_t, GROUPELEMENTS> GroupDelays;
 
 /// Delays for the Whole Transducer Array
-typedef array<array<GroupDelays, YGROUPS>, XGROUPS + 1> Delays;
+typedef Matrix<int8_t, NUMGROUPS, GROUPELEMENTS> Delays;
 
 /// Phase Offsets 
 typedef Delays Phases;
 
 // Taylor Coefficient Types
 /// Taylor Transmission Coefficients
-typedef array<int16_t, 8> TxCoeffs;
+typedef Vector<int16_t, 8> TxCoeffs;
 
 /// Taylor Receiving Coefficients
-typedef array<int16_t, 10> RxCoeffs;
+typedef Vector<int16_t, 10> RxCoeffs;
 
 // Easy Use Types
 /// Represents A Group on the ASIC
@@ -51,172 +54,11 @@ typedef uint8_t Elem;
 typedef struct { Group group: 6; Elem loc: 4; } Element;
 
 /**
- * \brief Gets the Physical Location/Index of an Element with regards to its logical location
- * \note Evaluated at Compile Time
- * \param group: The Logical Group
- * \param loc: The logical Element within the group
- * \return Element: The Actual Physical Location
- */
-constexpr const Element LookupElement(const Group group, const Elem loc) noexcept;
-
-/**
  * \brief Container Class for the ASIC functionality
  */
 class ASIC {
 
 public:
-
-    /**
-     * \brief 
-     * 
-     */
-    class Config {
-
-    public:
-
-        /**
-         * \brief Construct a new Config object
-         * \note Fills with the Default Values
-         */
-        Config();   
-
-        /**
-         * \brief Construct a new Config object
-         * 
-         * \param config 
-         */
-        Config(const Config& config);
-
-        /**
-         * \brief Enum for the clock speed of the ASIC, Either Low: 25MHz, or High: 100MHz
-         */
-        enum ClkSpeed : uint8_t {
-
-            LOW = 25,  ///< 25MHz
-            HIGH = 100 ///< 100MHz
-
-        };
-
-        /**
-         * \brief Set the Clock Speed object
-         * 
-         * \param speed 
-         */
-        void SetClockSpeed(const ClkSpeed speed);
-
-        /**
-        * \brief 
-        * 
-        */
-        struct Pulse {
-
-            enum PulseSubType: uint8_t {
-
-                FIFTY_GAIN8 = 0,        ///< 50 ns Pulse Gain of 8
-                HUNDRED_GAIN8 = 1,      ///< 100ns Pulse Gain of 8
-                FIFTY_GAIN2 = 2,        ///< 50ns Pulse Gain of 2
-                FIFTY_GAIN0 = 3,        ///< 50ns Pulse Gain of 0
-                HUNDRED_GAIN0 = 4,      ///< 100ns Pulse Gain of 0
-                DARK_GAIN8 = 5,         ///< Dark Pulse Gain of 8
-                FIFTY_GAIN1 = 6,        ///< 50ns Pulse Gain of 1
-                DARK_GAIN0 = 7,         ///< Dark Pulse Gain of 0
-                TW_FIVE_GAIN8 = 8,      ///< 25ns Pulse Gain of 8
-                FIFTY_NEG_GAIN8 = 9,    ///< 50ns Negative Pulse Gain of 8
-                DARK_NEG_GAIN8 = 10,    ///< Dark Negative Pulse Gain of 8
-                HUNDRED_NEG_GAIN8 = 11  ///< 100ns Negative Pulse Gain of 8
-
-            };
-
-            /**
-            * \brief 
-            * 
-            */
-            enum PulseType: uint8_t {
-
-                UNIPOLAR = 0    ///< One Peak
-
-            };
-
-            PulseType type;         ///< The Shape of the Pulse
-            PulseSubType subtype;   ///< The Length and Gain
-
-        };
-
-        /**
-         * \brief Set the Pulse object
-         * 
-         * \param pulse 
-         */
-        void SetPulse(const Pulse pulse);
-
-        /**
-         * \brief 
-         * 
-         */
-        struct BeamTiming {
-
-            double SetupTime;       ///<           
-            double RunRxTime;       ///<
-            double RunTXTime;       ///<
-            double StopTXTime;      ///<
-            double StopRXTime;      ///<
-            double AnaResetStopTime;///<
-            double PreChargeTime;   ///<
-        
-        };
-
-        /**
-         * \brief Set the Beam Timing object
-         * 
-         * \param timing 
-         */
-        void SetBeamTiming(const BeamTiming timing);
-
-        /**
-         * \brief 
-         * 
-         */
-        struct DRVConfig {
-
-            bool Enable;    ///< If DRV is Enabled
-            bool FFen;      ///<
-            double Bias;    ///<
-
-        };
-
-        /**
-         * \brief 
-         * 
-         * \param config 
-         */
-        void SetDRVConfig(const DRVConfig& config);
-
-        /**
-         * \brief 
-         * 
-         */
-        enum BModeSetting : bool {
-
-            DELAYS = 0, ///< Send the Element Delays
-            COEFFS = 1  ///< Send the Compression Coefficient
-
-        };
-
-        /**
-         * \brief 
-         * 
-         * \param bmodesetting 
-         */
-        void SetBModeSetting(const BModeSetting& bmodesetting);
-
-    private:
-
-        BModeSetting bmodesetting;  ///< uBeanforming Settings 
-        Pulse pulse;                ///< Pulse Configuration 
-        ClkSpeed speed;             ///< ASIC Clock Speed
-        DRVConfig drvconfig;        ///< DRV Configuration
-
-    };
 
     /**
      * \brief  
@@ -232,14 +74,14 @@ public:
      * \param driver 
      * \param config 
      */
-    ASIC(const Interface& driver, const Config& config);
+    ASIC(const Interface& driver, const ASICParams& config);
 
     /**
      * \brief Set the Config object
      * 
      * \param config 
      */
-    void SetConfig(const Config& config);
+    void SetConfig(const ASICParams& config);
 
     /**
      * \brief Get the Error object
@@ -356,7 +198,7 @@ public:
      * \param cap_pf
      * \return void
      */
-    void GetGroupCapacitance(const uint8_t group, array<double, GROUPELEMENTS>& cap_pf);
+    void GetGroupCapacitance(const Group group, array<double, GROUPELEMENTS>& cap_pf);
     
     /**
      * \brief Get the Element Capaitance object
@@ -409,6 +251,15 @@ public:
      * \return const char*: The String Associated with the Error Code 
      */
     static constexpr const char* GetErrorMessage(const Error code) noexcept;
+
+    /**
+     * \brief Gets the Physical Location/Index of an Element with regards to its logical location
+     * \note Evaluated at Compile Time
+     * \param group: The Logical Group
+     * \param loc: The logical Element within the group
+     * \return Element: The Actual Physical Location
+     */
+    static constexpr const Element LookupElement(const Group group, const Elem loc) noexcept;
 
 private:
 

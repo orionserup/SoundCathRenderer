@@ -12,7 +12,7 @@
 
 using namespace SoundCath;
 
-constexpr const char* FPGA::GetErrorMessage(const FPGA::Error error)  {
+constexpr const char* FPGA::GetErrorMessage(const FPGA::Error error) noexcept {
 
     switch(error) {
 

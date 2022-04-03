@@ -26,23 +26,6 @@ class FPGA {
 
 public:
 
-    class Config {
-
-    public:
-
-        /**
-         * \brief Construct a new Config object
-         * 
-         */
-        Config();
-
-
-    private:
-
-
-
-    };
-
     /**
      * \brief Construct a new FPGA object
      * 
@@ -81,7 +64,7 @@ public:
         CLKBUSY = 1 << 10,      ///< Clock is Busy
         OVERFULL  = 1 << 16,    ///< The Memory is too full
         FRAME_ERROR = 1 << 17   ///< Frame Memory Error
-
+        
     };
 
     /**

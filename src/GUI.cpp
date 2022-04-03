@@ -15,6 +15,5 @@
 #include <vtkNew.h>
 
 
-
 using namespace SoundCath;
 

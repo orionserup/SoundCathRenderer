@@ -27,7 +27,7 @@ find_package(VTK COMPONENTS
 
 #---------------------- Compile Options ----------------- #
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 if(MSVC)
@@ -101,7 +101,7 @@ endif()
 
 # -------------------- Testing ----------------------- #
 
-option(ENABLE_TESTING "Create A Target That Tests the Software")
+option(ENABLE_TESTING "Create A Target That Tests the Software" OFF)
 if(ENABLE_TESTING)
     add_subdirectory(../test ../test)
 endif()

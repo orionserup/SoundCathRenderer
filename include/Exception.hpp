@@ -71,4 +71,11 @@ private:
 
 };
 
+class ControllerException: public std::exception {
+
+
+
+
+};
+
 }

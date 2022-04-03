@@ -1,20 +1,13 @@
 cmake_minimum_required(VERSION 3.10)
 
 include(CTest)
+include(Catch)
 
 include_directories(../include)
 
-file(GLOB ASICTESTS ./ASIC/*.cpp)
-file(GLOB FPGATESTS ./FPGA/*.cpp)
-file(GLOB DRIVERTESTS ./Driver/*.cpp)
-file(GLOB CONTROLTESTS ./Controller/*.cpp)
-file(GLOB RENDERTESTS ./Renderer/*.cpp)
+file(GLOB SOURCES */*.cpp)
 
-add_executable(ASICTester ${ASICTESTS})
-add_executable(FPGATester ${FPGATESTS})
-add_executable(DriverTester ${DRIVERTESTS})
-add_executable(ControllerTester ${CONTROLTESTS})
-add_executable(RendererTester ${RENDERTESTS})
+add_executable(Tests ${SOURCES})
+target_link_libraries(Tests PRIVATE Catch2::Catch2)
 
-# All of the Tests to Run
-add_test(NAME DRIVERQUERY COMMAND ./DriverTester --query)
+catch_discover_tests(Tests)

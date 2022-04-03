@@ -21,6 +21,9 @@
 #include "ASIC.hpp"
 #include "FPGA.hpp"
 
+using Eigen::Matrix;
+using Eigen::Vector;
+
 using std::array;
 using std::vector;
 
@@ -84,9 +87,9 @@ private:
 
 struct DynRxData {
 
-    array<double, 8> slope;
-    array<double, 8> duration;
-    array<double, 9> mastercurve;
+    Vector<double, 8> slope;
+    Vector<double, 8> duration;
+    Vector<double, 9> mastercurve;
 
 };
 
@@ -113,10 +116,9 @@ public:
      * \param focalpoint 
      * \param beanoffset_s 
      * \param resolution_ns 
-     * \param csound 
      * \return double 
      */
-    double CompressTaylor(RectPoint& focalpoint, double beanoffset_s, double resolution_ns, double csound = 1520.0f);
+    double CompressTaylor(const RectPoint& focalpoint, const double beanoffset_s, const double resolution_ns);
 
     /**
      * \brief 
@@ -132,7 +134,7 @@ public:
      * \param runtime 
      * \return double 
      */
-    double CompressTaylorDyn(double x_deg, double y_deg, uint8_t runtime);
+    double CompressTaylorDyn(double x_deg, double y_deg, const uint8_t runtime);
 
     /**
      * \brief 
@@ -157,8 +159,9 @@ private:
     
     std::queue<DynRxData> dyndata;  ///< A Queue Of Dynamic RX Data
     std::queue<RxCoeffs> coeffs;    ///< A Queue of Coefficients to Send to the FPGA/ASIC
-    std::queue<Delays> delays;      ///< A Queue of Delays to Send to the FPGA/ASIC
-    std::queue<Phases> phases;      ///< A Queue of Phases to Send to the FPGA/ASIC
+    std::queue<Delays> delays;                ///< Delays to Send to the FPGA/ASIC
+    std::queue<Phases> phases;                ///< Phases to Send to the FPGA/ASIC
+    double maxdistance_mm{5.0};     ///< Maximum Distance to recieve from
 
 };
 
@@ -228,12 +231,6 @@ public:
      * \return std::string 
      */
     std::string GenerateDelayStr(const TxCoeffs& coeffs);
-
-    /**
-     * \brief Destroy the Controller object
-     * 
-     */
-    ~Controller();
 
 private:
 
