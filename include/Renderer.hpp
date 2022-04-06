@@ -52,7 +52,6 @@ public:
      */
     Renderer(const string filename);
 
-
     /**
      * \brief 
      * 

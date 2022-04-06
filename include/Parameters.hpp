@@ -102,14 +102,14 @@ namespace SoundCath {
          */
         struct BModeSettings {
 
-            std::vector<uint8_t> groups{ALLGROUPS};       ///< The beam forming groups that are active
-            std::array<char, 2> axes{'y', 'x'};         ///< The Steering Axes
+            std::vector<uint8_t> groups{ALLGROUPS};                         ///< The beam forming groups that are active
+            std::array<char, 2> axes{'y', 'x'};                             ///< The Steering Axes
             std::array<std::string, 2> steering{"-30:5:30", "-30:3:30"};    ///< The Steering Angle Arrays
-            std::array<std::string, 2> mlasteering{"-30:1:30", "-30:1:30"}; //< The MLA Steering Angle Arrays
-            float maxangleradius{30};   //
-            bool usequeue{true};
-            float depthrange{.250f};
-            float dbrange{-40.0f};
+            std::array<std::string, 2> mlasteering{"-30:1:30", "-30:1:30"}; ///< The MLA Steering Angle Arrays
+            float maxangleradius{30};   ///< The Maximum Angle Magnitude
+            bool usequeue{true};        ///< Whether or not to queue up the beams before sending
+            float depthrange{.250f};    ///< The Range of the Depth
+            float dbrange{-40.0f};      ///< The Power Range
 
         };
 
@@ -136,7 +136,7 @@ namespace SoundCath {
 
     private:
 
-        BModeSettings bmodesettings;  ///< uBeanforming Settings 
+        BModeSettings bmodesettings;///< uBeanforming Settings 
         ClkSpeed speed;             ///< ASIC Clock Speed
         DRVConfig drvconfig;        ///< DRV Configuration
         BeamTiming timing;          ///< The Beam Timing
@@ -157,7 +157,7 @@ namespace SoundCath {
         */
         struct Pulse {
 
-            enum PulseSubType: uint8_t {
+            enum SubType: uint8_t {
 
                 FIFTY_GAIN8 = 0,        ///< 50 ns Pulse Gain of 8
                 HUNDRED_GAIN8 = 1,      ///< 100ns Pulse Gain of 8
@@ -178,7 +178,7 @@ namespace SoundCath {
             * \brief 
             * 
             */
-            enum PulseType: uint8_t {
+            enum Type: uint8_t {
 
                 UNIPOLAR = 0    ///< One Peak
 
@@ -190,7 +190,7 @@ namespace SoundCath {
              * \param type
              * \param subtype
              */
-            Pulse(PulseType type, PulseSubType subtype);
+            Pulse(Type type, SubType subtype);
             
             /**
              * \brief Construct a new Pulse object
@@ -198,8 +198,8 @@ namespace SoundCath {
              */
             Pulse() = default;
 
-            PulseType type{UNIPOLAR};       ///< The Shape of the Pulse
-            PulseSubType subtype;           ///< The Length and Gain
+            Type type{UNIPOLAR};                   ///< The Shape of the Pulse
+            SubType subtype{FIFTY_GAIN8};          ///< The Length and Gain
 
         };
 
@@ -220,14 +220,33 @@ namespace SoundCath {
     private:
 
         Pulse pulse;        ///< The Pulse Shape and Type
-        float attenuation;  ///< attenuation in dB/MHz*cm , .5 for phantom 1 for water
+        float attenuation{.5f};  ///< attenuation in dB/MHz*cm , .5 for phantom 1 for water
 
     };
 
     class RenderParams {
 
+        float fps{20.0f};   ///< The Rendering Frames Per Second
 
 
+    };
+
+    struct ControllerParams {
+
+
+    };
+
+    /**
+     * \brief 
+     * 
+     */
+    struct Params {
+
+        RenderParams renderparams; ///< The Parameters for the renderer
+        USParams usparams;          ///< The Parameters for the Ultrasound
+        ASICParams asicparams;      ///< The Parameters for the ASIC
+        FPGAParams fpgaparams;      ///< The Parameters for the FPGA
+        ControllerParams controllerparams;  ///< The Parameters For the UltraSound Controller
 
     };
 
@@ -260,19 +279,22 @@ namespace SoundCath {
          */
         void ParseCL(const int argc, const char* const* const kwargs);
 
+        /**
+         * \brief Get the Params object
+         * 
+         * \return Params& 
+         */
+        Params& GetParams() { return this->params; }
 
     private:
 
+        Params params; ///< The parsed Parameters
+    
         /**
          * \brief 
          * 
          */
-        void PrintMenu();
-
-        ASICParams asicparams;
-        FPGAParams fpgaparams;
-        USParams usparams;      
-        RenderParams renderparams;
+        void PrintMenu();    
 
     };
 }

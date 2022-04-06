@@ -20,6 +20,7 @@
 #include "Constants.hpp"
 #include "ASIC.hpp"
 #include "FPGA.hpp"
+#include "Parameters.hpp"
 
 using Eigen::Matrix;
 using Eigen::Vector;
@@ -30,7 +31,7 @@ using std::vector;
 namespace SoundCath {
 
 /**
- * \brief 
+ * \brief Controller for the Transission, generates the Appropiate Delays and Coefficients
  * 
  */
 class TXController {
@@ -38,22 +39,22 @@ class TXController {
     /**
      * \brief Construct a new TXController object
      * 
-     * \param max_distance_mm 
+     * \param[in] max_distance_mm: Maximum Distance to Transmit to
      */
-    TXController(const float max_distance_mm);
+    TXController(const ControllerParams& params);
 
     /**
-     * \brief Construct a new TXController object
+     * \brief Generate Delays for the Begining with empty Data
      * 
      */
-    TXController();
+    void PreCalcTxDelays();
 
     /**
-     * \brief 
+     * \brief Generate The Taylor Polynomial for the Given Parameters
      * 
-     * \param focalpoint 
-     * \param beamoffset_s 
-     * \param resolution_ns 
+     * \param[in] focalpoint: Point To Focus On
+     * \param[in] beamoffset_s: 
+     * \param[in] resolution_ns:  
      * \return double 
      */
     double CompressTaylor(const RectPoint& focalpoint, double beamoffset_s, double resolution_ns);
@@ -70,13 +71,12 @@ class TXController {
      * 
      */
     void UncompressTaylor();
-    
-    /**
-     * \brief 
-     * 
-     * \param groupdelay 
-     */
-    void DelayUncompression(double groupdelay);
+
+    void AddDelayToQueue(const Delays& delay);
+
+    std::queue<Delays> GetDelayQueue() const { return this->delays; }
+
+    std::queue<TxCoeffs> GetCoeffQueue() const { return this->coeffs; };
 
 private:
 
@@ -102,13 +102,7 @@ public:
      * 
      * \param maxdistance_mm 
      */
-    RXController(const float maxdistance_mm);
-
-    /**
-     * \brief Construct a new RXController object
-     * 
-     */
-    RXController();
+    RXController(const ControllerParams& params);
 
     /**
      * \brief 
@@ -177,7 +171,7 @@ public:
      * \brief Construct a new Controller object
      * 
      */
-    Controller(const Interface& face);
+    Controller(const Driver& face);
 
     /**
      * \brief Construct a new Controller object
@@ -234,7 +228,7 @@ public:
 
 private:
 
-    Interface face; ///< Interface to Send the Commands through
+    Driver& face; ///< Interface to Send the Commands through
 
     TXController tx;///< Transmssion Controller
     RXController rx;///< Receiving Controller

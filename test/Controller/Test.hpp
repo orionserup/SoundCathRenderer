@@ -9,21 +9,58 @@
  * 
  */
 
+#include "Controller.hpp"
+
+namespace SoundCath {
+
 class ControllerTester {
 
 
 
 
+private:
+
+    RXControllerTester rxtester;
+    TXControllerTester txtester;
+
 };
 
 class RXControllerTester {
 
+public:
 
+    bool TestTaylorCompression();
+
+    bool TestTaylorDecompression();
+
+    bool TestDynTaylorCompression();
+
+    bool TestDynTaylorDecompression();
+
+private:
+
+    RXController rx;
 
 };
 
 class TXControllerTester {
 
+public:
+
+    bool TestTaylorCompression();
+
+    bool TestTaylorDecompression();
+
+    bool TestDynTaylorCompression();
+
+    bool TestDynTaylorDecompression();
+
+    bool TestGenerateDelays();
+
+    bool Test
+
 
 
 };
+
+}

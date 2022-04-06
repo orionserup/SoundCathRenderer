@@ -11,10 +11,8 @@
 
 #pragma once
 
-#include "Interface.hpp"
+#include "Driver.hpp"
 #include <string>
-
-using std::string;
 
 namespace SoundCath {
 
@@ -31,21 +29,21 @@ public:
      * 
      * \param face 
      */
-    FPGA(const Interface& face);
+    FPGA(Driver& face);
 
     /**
      * \brief Get the Version object
      * 
      * \return string 
      */
-    string GetVersion();
+    std::string GetVersion() const { return this->version; }
 
     /**
      * \brief Get the Description object
      * 
      * \return string 
      */
-    string GetDescription();
+    std::string GetDescription() const { return this->desc; }
 
     /**
     * \brief 
@@ -64,8 +62,15 @@ public:
         CLKBUSY = 1 << 10,      ///< Clock is Busy
         OVERFULL  = 1 << 16,    ///< The Memory is too full
         FRAME_ERROR = 1 << 17   ///< Frame Memory Error
-        
+
     };
+
+    /**
+     * \brief Get the Error object
+     * 
+     * \return Error 
+     */
+    Error GetError() const;
 
     /**
      * \brief Get the Error Message object
@@ -77,9 +82,27 @@ public:
 
 private:
 
-    Interface& face;    ///< The Physical Interface that is Connected to the FPGA
-    string version;     ///< The HDL Version
-    string desc;        ///< Physical Description
+    Driver& face;             ///< The Physical Interface that is Connected to the FPGA
+    std::string version;     ///< The HDL Version
+    std::string desc;        ///< Physical Description
+    FPGAParams params;       ///< Parameters for the FPGA
+
+    // ---------------------- Command Helper Functions -------------------------- //
+
+    /**
+     * \brief Get the Description Command object
+     * 
+     * \return constexpr const char* 
+     */
+    static constexpr const char* GetDescriptionCommand() noexcept;
+    
+    /**
+     * \brief Get the Version Command object
+     * 
+     * \return constexpr const char* 
+     */
+    static constexpr const char* GetVersionCommand() noexcept;
+
 
 };
 

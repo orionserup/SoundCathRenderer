@@ -15,7 +15,6 @@
 
 #include "ASIC.hpp"
 #include "FPGA.hpp"
-#include "Interface.hpp"
 
 namespace SoundCath {
 
@@ -32,14 +31,14 @@ public:
      * 
      * \param error: The Error Code to use
      */
-    ASICException(ASIC::Error error);
+    ASICException(const ASIC::Error error);
 
     /**
      * \brief Returns the Error Message
      * 
      * \return const char*: The Error Message
      */
-    inline const char* what() const noexcept;
+    const char* what() const noexcept override;
 
 private:
 
@@ -47,6 +46,10 @@ private:
 
 };
 
+/**
+ * \brief 
+ * 
+ */
 class DriverException: public std::exception {
 
 public:
@@ -56,14 +59,14 @@ public:
      * 
      * \param error: The Error to Give it
      */
-    DriverException(const Interface::Error error);
+    DriverException(const Driver::Error error);
     
     /**
      * \brief Gets the String Associated with the Error
      * 
      * \return const char*: The Error Message
      */
-    const char* what() const noexcept;
+    const char* what() const noexcept override;
 
 private:
 
@@ -71,10 +74,55 @@ private:
 
 };
 
+/**
+ * \brief 
+ * 
+ */
 class ControllerException: public std::exception {
 
+public:
 
+    /**
+     * \brief Construct a new Controller Exception object
+     * 
+     * \param message
+     */
+    ControllerException(const char* message);
 
+    /**
+     * \brief 
+     * 
+     * \return const char* 
+     */
+    const char* what() const noexcept override;
+
+private:
+
+    const char* message;    ///< The Error Message
+
+};
+
+class FPGAException: public std::exception {
+
+public:
+
+    /**
+     * \brief Construct a new FPGAException object
+     * 
+     * \param error
+     */
+    FPGAException(const FPGA::Error error);
+
+    /**
+     * \brief 
+     * 
+     * \return const char* 
+     */
+    const char* what() const noexcept override;
+
+private:
+
+    FPGA::Error error;  ///< 
 
 };
 
