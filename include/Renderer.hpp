@@ -88,7 +88,6 @@ public:
      */
     void SaveToFile(const std::string filename);
 
-    friend class GUI;
 
 private:
 

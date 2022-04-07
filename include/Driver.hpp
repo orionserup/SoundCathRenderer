@@ -43,9 +43,8 @@ class Driver {
 public:
 
     /**
-     * \brief
-     * \note
-     * \retval
+     * \brief Construct a new Driver object
+     * 
      */
     Driver();
 
@@ -56,46 +55,45 @@ public:
     ~Driver();
 
     /**
-     * \brief
-     * \note
-     * \param  command:
-     * \retval
+     * \brief Sends A Command String and Returns what The Interface Sent Back
+     * \throws DriverException: If there are Issues on the Backend
+     * \param[in] command: Command To Send the Device
+     * \return std::string: What The Device Sent Back
      */
     std::string Query(const std::string& command) const;
 
     /**
-     * \brief 
-     * 
-     * \param command
-     * \return DriverError 
+     * \brief Sends A Command String To The Interface Box
+     * \throws DriverException: If there are any issues On the Backend
+     * \param[in] command: Command String To Send
      */
     void Send(const std::string& command) const;
 
     /**
-     * \brief Gets the 
+     * \brief Receives the Last Output to an External String
      * 
-     * \param output: String to Output to
+     * \param[out] output: String to Receieve to 
      */
     void Recv(std::string& output) const noexcept;
 
     /**
-     * \brief 
+     * \brief Gets the Last Received Response
      * 
      * \return string: The String the Driver Sent Back
      */
     std::string Recv() const noexcept { return GetOutString(); }
 
     /**
-     * \brief Get the Result object
+     * \brief Gets the Reponse String From the Last Output (ie all of the important Data)
      * 
-     * \return std::string 
+     * \return std::string: A substring of the output string without echo of the send string
      */
     std::string GetResult() const noexcept;
 
     /**
-     * \brief Get the Out String object
+     * \brief Get the Output String of the Last Command Sent
      * 
-     * \return std::string& 
+     * \return std::string: The Reponse From The Last Command
      */
     std::string GetOutString() const noexcept { return std::string(outbuffer.data()); }
 
@@ -120,10 +118,10 @@ public:
     };
 
     /**
-     * \brief Get the Error Message object
+     * \brief Get the Error Message From the Error Code
      * 
-     * \param error
-     * \return constexpr const char* 
+     * \param[in] error
+     * \return constexpr const char*: The Error Message as a String
      */
     static inline constexpr const char* GetErrorMessage(const Error error) noexcept;
 
@@ -138,8 +136,8 @@ private:
 
     /**
      * \brief Throws the errors cooresponding to a set uint32_t return code
-     * 
-     * \param error: Error Code, combination of different Errors to Parse
+     * \throws DriverException: Because thats the Point
+     * \param[in] error: Error Code, combination of different Errors to Parse
      * 
      * The Error Codes are stored as bits, so all of the bits that are set in the integer return code represent 
      * a different error, so we just check the bits that are set and throw the cooresponding exceptions

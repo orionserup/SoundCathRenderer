@@ -14,26 +14,38 @@
 #include <cstdint>
 #include <vector>
 #include <array>
+#include <string>
 
 #include "ASIC.hpp"
 
 namespace SoundCath {
 
-    class FPGAParams {
+    struct FPGAParams {
 
-
+        std::string Name{"Neso Artix 7 FPGA Module"};
+        
+        bool DisableLED{true};
 
     };
 
     
-    class ASICParams {
-
-    public:
+    struct ASICParams {
 
         struct CoreSettings {
 
-
-
+            uint8_t ISelLNA{4};             ///< Current Sensing LNA (0 - 15) Default 4
+            uint8_t ISelOdrv{3};            ///< Current Setting Output Driver (0 - 15) Default 3
+            uint8_t ISelResCtrl{6};         ///< Current Sensing TGC (0 - 15) Default 6
+            uint8_t ISelDcGND{8};           ///< Current Settting Discharge to Ground (0 - 15) Default 8
+            uint8_t ResCal{4};              ///< LNA Bias Resistor Calibration Current (0 - 7) Default 4
+            bool AnalogResetNoRx{false};    ///< Automatic Analog Reset When Not in RX (t/f) Default false
+            bool AnalogResetAuto{true};     ///< Automatic Transmission/Reception Control (t/f) Default true
+            bool LNAAutoPowerDown{true};    ///< Automatic LNA Powerdown when not in RX (t/f) Default true
+            bool BiasEn{true};              ///< Enable Biasing (t/f) Default true
+            bool ODrvEn{true};              ///< Enable Overdrive (t/f) Default true
+            bool RxAlwaysEn{true};          ///< Always Enable Reception (t/f) Default true
+            bool CWEn{false};               ///< Enable Continuous Mode (t/f) Default True
+            bool LNAEn{true};               ///< Enable LNA (t/f) Default true
 
         };
 
@@ -60,13 +72,14 @@ namespace SoundCath {
          */
         struct BeamTiming {
 
-            double SetupTime;       ///<           
-            double RunRxTime;       ///<
-            double RunTXTime;       ///<
-            double StopTXTime;      ///<
-            double StopRXTime;      ///<
-            double AnaResetStopTime;///<
-            double PreChargeTime;   ///<
+            uint8_t SetupTime;       ///<           
+            uint8_t RunRxTime;       ///<
+            uint8_t RunTXTime;       ///<
+            uint8_t StopTXTime;      ///<
+            uint8_t StopRXTime;      ///<
+            uint8_t AnaResetStopTime;///<
+            uint8_t PreChargeTime;   ///<
+
         
         };
 
@@ -85,7 +98,7 @@ namespace SoundCath {
 
             bool Enable;    ///< If DRV is Enabled
             bool FFen;      ///<
-            double Bias;    ///<
+            uint8_t Bias;   ///<
 
         };
 

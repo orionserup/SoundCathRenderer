@@ -29,7 +29,7 @@ public:
     /**
      * \brief Construct a new ASICException object
      * 
-     * \param error: The Error Code to use
+     * \param[in] error: The Error Code to use
      */
     ASICException(const ASIC::Error error);
 
@@ -70,7 +70,7 @@ public:
 
 private:
 
-    Interface::Error error; ///< The Actual Error
+    Driver::Error error; ///< The Actual Error
 
 };
 
@@ -109,7 +109,7 @@ public:
     /**
      * \brief Construct a new FPGAException object
      * 
-     * \param error
+     * \param[in] error
      */
     FPGAException(const FPGA::Error error);
 

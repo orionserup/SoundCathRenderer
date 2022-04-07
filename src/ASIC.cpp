@@ -54,7 +54,7 @@ void ASIC::SetConfig(ASICParams& params) {
 
 ASIC::Error ASIC::GetError() const {
 
-    std::string resp = driver.Query("GetASICError");
+    std::string resp = driver.Query(GetErrorCommand());
     // Expected: GetASICError:RESULT:ASIC Error Status: 00, FPGA Error Status 00000000
     const static std::string header("ASIC Error Status: ");
     std::string digits = resp.substr(resp.find(header) + header.size(), 2);
@@ -126,7 +126,7 @@ void ASIC::FireGroup(const Group group, const GroupDelays& tx, const GroupDelays
 }
 
 
-void ASIC::FireGroup(const Group group, const GroupDelays& tx, const GroupDelays& rx, const Phases& rxphases) {
+void ASIC::FireGroup(const Group group, const GroupDelays& tx, const GroupDelays& rx, const GroupPhases& rxphases) {
 
     std::ostringstream command;
     command << FireGroupCommand() << group << ':' << tx;
@@ -189,6 +189,38 @@ double ASIC::GetBandGapV() const {
 
 bool ASIC::RunTests() const {
 
+
+}
+
+// --------------------------- Utility Functions ------------------------ //
+
+
+std::ostream& operator<<(std::ostream& os, const SoundCath::GroupDelays& rx) {
+
+
+
+}
+
+std::ostream& operator<<(std::ostream& os, const SoundCath::Delays& delays) {
+
+
+
+}
+
+std::istream& operator>>(std::istream& is, SoundCath::Delays& delays) {
+
+
+
+}
+
+std::ostream& operator<<(std::ostream& os, const SoundCath::TxCoeffs& rx) {
+
+
+}
+
+std::ostream& operator<<(std::ostream& os, const SoundCath::RxCoeffs& rx) {
+
+    
 
 }
 

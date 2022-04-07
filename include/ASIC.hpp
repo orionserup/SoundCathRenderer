@@ -18,9 +18,7 @@
 #include <Eigen/Dense>
 
 #include <string>
-
-using std::string;
-using std::array;
+#include <iostream>
 
 namespace SoundCath {
 
@@ -33,11 +31,11 @@ typedef Vector<int8_t, GROUPELEMENTS> GroupDelays;
 typedef GroupDelays GroupPhases;
 
 /**
- * \brief 
- * 
- * \param os
- * \param rx
- * \return std::ostream& 
+ * \brief Formats a Group Delay to A String/Stream 
+ * \throws ios_base::failure: If the Data Can't be Formatted
+ * \param[out] os: The Output Stream To Send the Formatted Data To 
+ * \param[in] rx: The Delays to Parse and Send
+ * \return std::ostream&:  A Modified output stream 
  */
 std::ostream& operator<<(std::ostream& os, const GroupDelays& rx);
 
@@ -45,45 +43,44 @@ std::ostream& operator<<(std::ostream& os, const GroupDelays& rx);
 typedef Matrix<int8_t, NUMGROUPS, GROUPELEMENTS> Delays;
 
 /**
- * \brief Prints 
- * 
- * \param os
- * \param rx
- * \return std::ostream& 
+ * \brief Prints A Delay to a Stream
+ * \throws ios_base::failure: If there is an Issue Reading the Value
+ * \param[out] os: Output Stream, Could be a string stream, cout, etc..
+ * \param[in] rx: Delay to write to the stream
+ * \return std::ostream&: A Modified Stream Reference for chaining
  */
 std::ostream& operator<<(std::ostream& os, const Delays& delays);
 
 /**
- * \brief 
- * 
- * \param is
- * \param delays
- * \return std::istream& 
+ * \brief Gets a Delay String and Turns It into an Actual Delay Object
+ * \throws ios_base::failure: If it can't resolve the Delay String
+ * \param[in] is: Input Stream to Get the String from 
+ * \param[out] delays: Actual Delay Object to Write to
+ * \return std::istream&: A modified input strema reference
  */
 std::istream& operator>>(std::istream& is, Delays& delays);
-
 
 // Taylor Coefficient Types
 /// Taylor Transmission Coefficients
 typedef Vector<int16_t, 8> TxCoeffs;
 /**
- * \brief 
- * 
- * \param os
- * \param rx
- * \return std::ostream& 
+ * \brief Formats Transmission Taylor Coefficents to A Stream/String
+ * \throws ios_base::failure: If the Coefficients cant be Formatted
+ * \param[in] os: Stream to Output To
+ * \param[in] tx: Transmission Coefficients to Format
+ * \return std::ostream&: A Modified Stream After Getting the data
  */
-std::ostream& operator<<(std::ostream& os, const TxCoeffs& rx);
+std::ostream& operator<<(std::ostream& os, const TxCoeffs& tx);
 
 /// Taylor Receiving Coefficients
 typedef Vector<int16_t, 10> RxCoeffs;
 
 /**
- * \brief 
- * 
- * \param os
- * \param rx
- * \return std::ostream& 
+ * \brief Formats Taylor Transmission Coefficients To A String/Stream
+ * \throws ios_base::failure: If the Coeffs can't be formatted
+ * \param[out] os: Stream To Output To
+ * \param[in] rx: Reception Coefficients to Read and Format
+ * \return std::ostream&: A Modified Stream With the Formatted String
  */
 std::ostream& operator<<(std::ostream& os, const RxCoeffs& rx);
 
@@ -97,8 +94,8 @@ typedef uint8_t Elem;
 /// Element Typedef between [0..1023]
 typedef struct { 
     
-    Group group: 6; 
-    Elem loc: 4; 
+    Group group: 6; ///< There are 64 Groups
+    Elem loc: 4;    ///< There are 16 Channels Per Group
 
 } Element;
 
@@ -125,32 +122,31 @@ public:
     };
 
     /**
-     * \brief  
-     * \note   
-     * \param  config
-     * \retval 
+     * \brief Construct a new ASIC object
+     * 
+     * \param[in] driver: Reference to an Interface to Talk to the ASIC With 
      */
     ASIC(Driver& driver);
 
     /**
      * \brief Construct a new ASIC object
      * 
-     * \param driver 
-     * \param config 
+     * \param[in] driver: Reference to a Interface to Talk to the ASIC 
+     * \param[in] config: Reference to a Settings Instance To configure the ASIC With
      */
     ASIC(Driver& driver, const ASICParams& config);
 
     /**
-     * \brief Set the Config object
+     * \brief Sends the Parameters to the ASIC
      * 
-     * \param config 
+     * \param[in] config: Reference to a ASICParams Object, the parameters to send to the ASIC
      */
     void SetConfig(const ASICParams& config) { params = config; }
 
     /**
-     * \brief Get the Error object
+     * \brief Get the Error Code From the last Operation
      * 
-     * \return ASICError 
+     * \return ASICError: The Error Code of the Last Operation
      */
     ASIC::Error GetError() const;
 
@@ -159,23 +155,23 @@ public:
     /**
      * \brief Fire the ASIC with the Given Transmission Delays
      * 
-     * \param delays: Delays to Transmit with
+     * \param[in] delays: Delays to Transmit with
      */
     void Fire(const Delays& delays);
 
     /**
      * \brief Fires the Whole ASIC and Receives to a Group
      * 
-     * \param group: Group to receive to
-     * \param tx: the Element delays to send with
-     * \param rx: The Group Delays to Send With
+     * \param[in] group: Group to receive to
+     * \param[in] tx: the Element delays to send with
+     * \param[in] rx: The Group Delays to Send With
      */
     void Fire(const Group group, const Delays& tx, const GroupDelays& rx);
 
     /**
      * \brief Fires a Single Element
      * 
-     * \param elem: Element to Fire
+     * \param[in] elem: Element to Fire
      */
     void Fire(const Element elem);
 
@@ -183,39 +179,43 @@ public:
 
     /**
      * \brief Fires a Group with the Given Transmission Delays
-     * 
-     * \param group: Group to Fire
-     * \param delay: Delay to Fire With
+     * \throws ASICException: If there is an Issue with the ASIC
+     * \throws DriverException: If there are any Issues at all on the backend
+     * \param[in] group: Group to Fire
+     * \param[in] delay: Delay to Fire With
      */
     void FireGroup(const Group group, const GroupDelays& tx);
 
     /**
      * \brief Fire a Group with Tx Delays and Receive from the Same Group with the RX Delays
-     * 
-     * \param group: Group to send and recieve from
-     * \param tx: Group Delays for Transmission
-     * \param rx: Group Delays for Reception
+     * \throws ASICException: If there is an Issue with the ASIC
+     * \throws DriverException: If there are any Issues at all on the backend
+     * \param[in] group: Group to send and recieve from
+     * \param[in] tx: Group Delays for Transmission
+     * \param[in] rx: Group Delays for Reception
      */
     void FireGroup(const Group group, const GroupDelays& tx, const GroupDelays& rx);
 
     /**
      * \brief Fire From a Group and Receive from a Different group
-     * 
-     * \param group: Group to Fire From
-     * \param tx: Group Delays To Transmit with 
-     * \param rx: Group Delays To Recieve with
-     * \param output: Group to Recieve from 
+     * \throws ASICException: If there is an Issue with the ASIC
+     * \throws DriverException: If there are any Issues at all on the backend
+     * \param[in] group: Group to Fire From
+     * \param[in] tx: Group Delays To Transmit with 
+     * \param[in] rx: Group Delays To Recieve with
+     * \param[in] output: Group to Recieve from 
      */
     void FireGroup(const Group txgroup, const GroupDelays& tx, const GroupDelays& rx, const Group rxgroup);
 
     /**
      * \brief Fire a Group and receive With a Dynamic Phase Rx
      * \note Phase Curves must be set before running
-     * 
-     * \param group: Group to Fire
-     * \param tx: Group Delay for Transmission
-     * \param rx: Group Delay for Reception
-     * \param rxphases: Phases for the Dynamic Rx
+     * \throws ASICException: If there is an Issue with the ASIC
+     * \throws DriverException: If there are any Issues at all on the backend 
+     * \param[in] group: Group to Fire
+     * \param[in] tx: Group Delay for Transmission
+     * \param[in] rx: Group Delay for Reception
+     * \param[in] rxphases: Phases for the Dynamic Rx
      */
     void FireGroup(const Group group, const GroupDelays& tx, const GroupDelays& rx, const GroupPhases& rxphases);
 
@@ -223,28 +223,32 @@ public:
 
     /**
      * \brief Read the Last Sent Transmission Delays 
-     * 
+     * \throws ASICException: If there is an Issue with the ASIC
+     * \throws DriverException: If there are any Issues at all on the backend
      * \param[out] delays: Delays to write to
      */
     void ReadTXDelays(Delays& delays);
 
     /**
      * \brief Read the last Reception Delays
-     * 
+     * \throws ASICException: If there is an Issue with the ASIC
+     * \throws DriverException: If there are any Issues at all on the backend
      * \param[out] delays: Delays received
      */
     void ReadRXDelays(Delays& delays);
 
     /**
-     * \brief Read the Last Received Reception Taylor Coefficents 
-     * 
-     * \param coeffs: The Received Taylor Coefficients
+     * \brief Read the Last Received Reception Taylor Coefficients 
+     * \throws ASICException: If there is an Issue with the ASIC
+     * \throws DriverException: If there are any Issues at all on the backend
+     * \param[out] coeffs: The Received Taylor Coefficients
      */
     void ReadRXCoeffs(RxCoeffs& coeffs);
 
     /**
      * \brief Recieves to a Single Element
-     * 
+     * \throws ASICException: If there is an Issue with the ASIC
+     * \throws DriverException: If there are any Issues at all on the backend
      * \param[in] elem: Element to Receive to
      */
     void RecvElement(const Element elem);
@@ -253,7 +257,8 @@ public:
 
     /**
      * \brief Add A Beam to the Queue with the Transmission and Reception Coefficients
-     * 
+     * \throws ASICException: If there is an Issue with the ASIC
+     * \throws DriverException: If there are any Issues at all on the backend
      * \param[in] tx: Transmission Coefficients 
      * \param[in] rx: Reception Coefficients
      */
@@ -261,7 +266,8 @@ public:
 
     /**
      * \brief Add a Beam to The Beam Queue with Delays Rather than Taylor Coefficients
-     * 
+     * \throws ASICException: If there is an Issue with the ASIC
+     * \throws DriverException: If there are any Issues at all on the backend
      * \param[in] tx: Transmission Delays
      * \param[in] rx: Reception Delays
      */
@@ -269,39 +275,45 @@ public:
 
     /**
      * \brief Send a Copy of the Last Sent Beam to the Top of the Queue in the FPGA
-     * 
+     * \throws ASICException: If there is an Issue with the ASIC
+     * \throws DriverException: If there are any Issues at all on the backend
      */
     void QueueRepeatBeam();
 
     /**
      * \brief Send the Beam Queue To the ASIC
-     * 
+     * \throws ASICException: If there is an Issue with the ASIC
+     * \throws DriverException: If there are any Issues at all on the backend
      */
     void FlushBeamQueue();
 
     /**
      * \brief Get the Number of Beams in the Beam Queue in the FPGA
-     * 
+     * \throws ASICException: If there is an Issue with the ASIC
+     * \throws DriverException: If there are any Issues at all on the backend
      * \return uint32_t: The Number of Beams in the Queue
      */
     uint32_t GetBeamQueueSize();
 
     /**
      * \brief Clear the Queue of all of the Beams in the FPGA
-     * 
+     * \throws ASICException: If there is an Issue with the ASIC
+     * \throws DriverException: If there are any Issues at all on the backend
      */
     void ClearBeamQueue();
 
     /**
      * \brief Send a Beam to Be Fired 
-     * 
+     * \throws ASICException: If there is an Issue with the ASIC
+     * \throws DriverException: If there are any Issues at all on the backend
      * \param[in] beaminqueue: Index of the Beam to Fire
      */
     void TriggerBeam(const uint8_t beaminqueue);
 
     /**
      * \brief Enter a Low Power State For A while, any command wakes it up
-     * 
+     * \throws ASICException: If there is an Issue with the ASIC
+     * \throws DriverException: If there are any Issues at all on the backend
      */
     void Freeze();
 
@@ -309,7 +321,8 @@ public:
 
     /**
      * \brief Get the Capacitance of the Group
-     * 
+     * \throws ASICException: If there is an Issue with the ASIC
+     * \throws DriverException: If there are any Issues at all on the backend
      * \param[in] group: Group to Check
      * \param[out] cap_pf: The Capacitances in pF
      * \return void
@@ -326,21 +339,32 @@ public:
 
     /**
      * \brief Get the Serial Num object
-     * 
+     * \throws ASICException: If there is an Issue with the ASIC
+     * \throws DriverException: If there are any Issues at all on the backend
      * \return std::string 
      */
     std::string GetSerialNum();
 
     /**
+     * \brief Set the Serial Number of the ASIC
+     * \throws ASICException: If there is an Issue with the ASIC
+     * \throws DriverException: If there are any Issues at all on the backend
+     * \param[in] serialnum: Serial Number String to Set it To
+     */
+    void SetSerialNum(const std::string serialnum);
+
+    /**
      * \brief Get the Band Gap Voltage of the Device
-     * 
+     * \throws ASICException: If there is an Issue with the ASIC
+     * \throws DriverException: If there are any Issues at all on the backend
      * \return double: The Band Gap in Volts
      */
     double GetBandGapV() const;
 
     /**
      * \brief Runs all of the Built in Tests from Oldelft
-     * 
+     * \throws ASICException: If there is an Issue with the ASIC
+     * \throws DriverException: If there are any Issues at all on the backend
      * \return true: If the Tests All Passed
      * \return false: If one or More Tests Fail
      */
@@ -371,13 +395,13 @@ private:
 
     /**
      * \brief Parse the Error Code and throw all of the Errors in the Code
-     * 
+     * \throws ASICException: Thats the Whole Point of the Function
      */
     void ThrowErrors(const Error error) const;
 
     /**
      * \brief Write the Parameters in the params object to the ASIC
-     * 
+     * \throws DriverException: If there are any Issues at all on the backend
      */
     void SetParams();
 
@@ -559,6 +583,13 @@ private:
      * \return constexpr const char* 
      */
     static constexpr const char* RunTestsCommand() noexcept;
+
+    /**
+     * \brief Get the Error Command object
+     * 
+     * \return constexpr const char* 
+     */
+    static constexpr const char* GetErrorCommand() noexcept;
 
 
 };

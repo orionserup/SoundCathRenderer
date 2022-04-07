@@ -65,11 +65,11 @@ FPGA::FPGA(Driver& face): face(face) {
 
     try {
 
-        std::string response = face.Query("FPGADescription"); // request the description
-        this->desc = response.substr(response.find("RESULT:") + 1); // get the description from what it gives
+        face.Send(GetDescriptionCommand()); // request the description
+        this->desc = face.GetResult(); // get the description from what it gives
 
-        response = face.Query("FPGAVersion"); // request the version
-        this->version = response.substr(response.find("RESULT:") + 1); // get the result from the result string
+        face.Send(GetVersionCommand()); // request the version
+        this->version = face.GetResult(); // get the result from the result string
 
     }
     catch(const std::exception e) {

@@ -154,7 +154,7 @@ private:
     std::queue<DynRxData> dyndata;  ///< A Queue Of Dynamic RX Data
     std::queue<RxCoeffs> coeffs;    ///< A Queue of Coefficients to Send to the FPGA/ASIC
     std::queue<Delays> delays;                ///< Delays to Send to the FPGA/ASIC
-    std::queue<Phases> phases;                ///< Phases to Send to the FPGA/ASIC
+    std::queue<GroupPhases> phases;                ///< Phases to Send to the FPGA/ASIC
     double maxdistance_mm{5.0};     ///< Maximum Distance to recieve from
 
 };
@@ -210,21 +210,6 @@ public:
      */
     double GetTimeDry();
 
-    /**
-     * \brief 
-     * 
-     * \param delay 
-     * \return std::string 
-     */
-    std::string GenerateDelayStr(const Delays& delay);
-    
-    /**
-     * \brief 
-     * 
-     * \param delay 
-     * \return std::string 
-     */
-    std::string GenerateDelayStr(const TxCoeffs& coeffs);
 
 private:
 
@@ -235,6 +220,8 @@ private:
     
     ASIC asic;      ///< The ASIC to Control 
     FPGA fpga;      ///< The FPGA to Control
+
+    ControllerParams params; ///< Parameters for Running
     
 };
 
