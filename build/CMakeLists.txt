@@ -38,23 +38,22 @@ if(MSVC)
 
 else()
 
-    set(CMAKE_CXX_FLAGS "-Wall")
+    set(CMAKE_CXX_FLAGS "-Wall -Wextra")
     set(CMAKE_CXX_FLAGS_DEBUG "-DDEBUG -Og -Wextra -pedantic")
     set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -Ofast -march=native -mtune=native")
 
-    set(CMAKE_EXE_LINKER_FLAGS "-flto")
-
 endif()
 
-file(GLOB SOURCES ../src/*[!main].cpp)
-file(GLOB INCLUDES ../include/*.h*)
+file(GLOB SOURCES "../src/*[!main].cpp" "../src/Exception.cpp")
+file(GLOB INCLUDES "../include/*.h*")
 
-file(GLOB TESTFILES ../test/*/*.hpp ../test/*/*.cpp)
+file(GLOB TESTFILES "../test/*/*.hpp" "../test/*/*.cpp")
+set(DOCSOURCES "../src" "../include" "../test/" "../README.md")
 
 #------------------- Compile Targets --------------------- #
 
 add_library(UltraSound STATIC ${SOURCES})
-target_include_directories(UltraSound PUBLIC ../include )
+target_include_directories(UltraSound PUBLIC ../include)
 
 set_target_properties(UltraSound PROPERTIES
                 ARCHIVE_OUTPUT_DIRECTORY ../lib
@@ -93,9 +92,18 @@ if(BUILD_DOCS)
     set(DOXYGEN_GENERATE_HTML YES)
     set(DOXYGEN_GENERATE_LATEX YES)
 
+    set(DOXYGEN_EXTRACT_ALL YES)
+    set(DOXYGEN_FULL_PATH_NAMES NO)
+    set(DOXYGEN_BUILTIN_STL_SUPPORT YES)
+
+    set(DOXYGEN_SOURCE_BROWSER YES)
+
+    set(DOXYGEN_USE_MDFILE_AS_MAINPAGE ../README.md)
+
     doxygen_add_docs(docs
-        "${INCLUDES} ${SOURCES} ${TESTFILES}"
-        WORKING_DIRECTORY ../docs)
+        ${DOCSOURCES}
+        WORKING_DIRECTORY ../docs
+        COMMENT "Generating PDF and HTML Documentation")
 
 endif()
 

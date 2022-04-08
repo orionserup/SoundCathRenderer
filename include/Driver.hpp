@@ -121,9 +121,9 @@ public:
      * \brief Get the Error Message From the Error Code
      * 
      * \param[in] error
-     * \return constexpr const char*: The Error Message as a String
+     * \return const char*: The Error Message as a String
      */
-    static inline constexpr const char* GetErrorMessage(const Error error) noexcept;
+    static const char* GetErrorMessage(const Error error) noexcept;
 
 private:
 

@@ -10,6 +10,7 @@
  */
 
 #include "Exception.hpp"
+
 #include <cassert>
 
 using SoundCath::ControllerException;

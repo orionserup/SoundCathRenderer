@@ -90,7 +90,7 @@ public:
 
 private:
 
-    //vtkNew<vtkRenderWindow> window;
+    vtkRenderWindow* window;
     Renderer& renderer;
 
 };

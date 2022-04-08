@@ -20,7 +20,7 @@ using SoundCath::DriverException;
 #ifdef _WIN32
 #define DLL "..\\..\\lib\\asic_call_wrapper_dll64.dll"
 
-Driver::Driver(): iostream(this) {
+Driver::Driver() v{
 
 	this->dll = LoadLibrary(DLL);
 		if (!this->dll) 
@@ -31,28 +31,30 @@ Driver::Driver(): iostream(this) {
         std::cerr << "\tERROR!!  Could Not Access or Find the ASIC Call Function in the DLL\n";
 
 }
+#endif
+
+Driver::Driver() {}
 
 void Driver::Send(const std::string& command) const {
 
-    int result = asic_call_parse(command, outbuffer.data());
+    Error result = Error(0);//asic_call_parse(command, outbuffer.data());
 		
-    if (!result) ThrowErrors();
+    if (!result) ThrowErrors(result);
 
 }
 
 Driver::~Driver() {
 
-    driver.Send("DriverClose")
-	FreeLibrary(this->dll);
+    Send(CloseCommand());
+	//FreeLibrary(this->dll);
 
 }
 
-#endif
 
 /**
  * \brief Gets the error Message Cooresponding with the Error at compile time
  */
-constexpr const char* Driver::GetErrorMessage(Driver::Error error) noexcept{
+const char* Driver::GetErrorMessage(Driver::Error error) noexcept{
 
     switch (error) {
 
@@ -107,12 +109,6 @@ std::string Driver::Query(const std::string& command) const {
 
     Send(command);
     return Recv();
-
-}
-
-std::string Driver::Recv() const {
-
-    return GetOutString();
 
 }
 

@@ -1,4 +1,13 @@
-
+/**
+ * \file asic_call_wrapper_dll.h
+ * \author Orion Serup (orionserup@gmail.com)
+ * \brief 
+ * \version 0.1
+ * \date 2022-04-07
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
 #ifdef _WIN32
 
 #ifndef ASIC_CALL_WRAPPER_H

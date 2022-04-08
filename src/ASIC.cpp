@@ -15,7 +15,7 @@
 
 using SoundCath::ASIC;
 
-constexpr const char* ASIC::GetErrorMessage(const ASIC::Error code) noexcept {
+const char* ASIC::GetErrorMessage(const ASIC::Error code) noexcept {
 
     switch (code) {
 
@@ -40,13 +40,13 @@ constexpr const char* ASIC::GetErrorMessage(const ASIC::Error code) noexcept {
 ASIC::ASIC(Driver& driver): driver(driver) {}
 
 
-ASIC::ASIC(Driver& driver, const ASICParams& config): driver(driver), params(config) {
+ASIC::ASIC(Driver& driver, const Params::ASICParams& config): driver(driver), params(config) {
 
-    SetParams();
+    //SetParams();
 
 }
 
-void ASIC::SetConfig(ASICParams& params) {
+void ASIC::SetConfig(const Params::ASICParams& params) {
 
 
 
@@ -139,7 +139,7 @@ void ASIC::ReadTXDelays(Delays& delays) {
 
     std::string resp{ driver.Query(ReadTXDelaysCommand()) };   
     std::string delaystr{ resp.substr(resp.find("[ASIC 0]:") + 1)}; // the delay string will be after the ASIC number
-    std::ostringstream output(driver.Recv()); // convert the output to a stream so that it can be converted to delays
+    std::istringstream output(driver.Recv()); // convert the output to a stream so that it can be converted to delays
     output >> delays; // convert to delays
 
 }
@@ -149,7 +149,7 @@ void ASIC::ReadRXDelays(Delays& delays) {
 
     std::string resp{ driver.Query(ReadRXDelaysCommand()) };   
     std::string delaystr{ resp.substr(resp.find("[ASIC 0]:") + 1)}; // the delay string will be after the ASIC number
-    std::ostringstream output(driver.Recv()); // convert the output to a stream so that it can be converted to delays
+    std::istringstream output(driver.Recv()); // convert the output to a stream so that it can be converted to delays
     output >> delays; // convert to delays and put it into the delay
 
 }
@@ -168,59 +168,66 @@ void ASIC::GetGroupCapacitance(const Group group, std::vector<double>& cap_pf) {
 
 float ASIC::GetElementCapacitance(const Element element) const { 
 
+    return 0.0f;
+
 }
 
 
 std::string ASIC::GetSerialNum() {
 
+    return this->serialnum;
 
 }
 
-void ASIC::SetSerialNum(const std::string& serialnum) noexcept {
+void ASIC::SetSerialNum(const std::string& serialnum) {
+
+    this->serialnum = serialnum;
 
 }
 
 
 double ASIC::GetBandGapV() const {
 
-
+    return 0.0f;
 
 }
 
 bool ASIC::RunTests() const {
 
+    return false;
 
 }
 
 // --------------------------- Utility Functions ------------------------ //
 
 
-std::ostream& operator<<(std::ostream& os, const SoundCath::GroupDelays& rx) {
+std::ostream& SoundCath::operator<<(std::ostream& os, const SoundCath::GroupDelays& rx) {
 
-
-
-}
-
-std::ostream& operator<<(std::ostream& os, const SoundCath::Delays& delays) {
-
-
+    return os;
 
 }
 
-std::istream& operator>>(std::istream& is, SoundCath::Delays& delays) {
+std::ostream& SoundCath::operator<<(std::ostream& os, const SoundCath::Delays& delays) {
 
-
-
-}
-
-std::ostream& operator<<(std::ostream& os, const SoundCath::TxCoeffs& rx) {
-
+    return os;
 
 }
 
-std::ostream& operator<<(std::ostream& os, const SoundCath::RxCoeffs& rx) {
+std::istream& SoundCath::operator>>(std::istream& is, SoundCath::Delays& delays) {
 
-    
+    return is;
+
+}
+
+std::ostream& SoundCath::operator<<(std::ostream& os, const SoundCath::TxCoeffs& rx) {
+
+    return os;
+
+}
+
+std::ostream& SoundCath::operator<<(std::ostream& os, const SoundCath::RxCoeffs& rx) {
+
+    return os;
 
 }
 
@@ -246,18 +253,19 @@ constexpr const char* ASIC::GetGroupCapacitanceCommand(const Group group) noexce
 
 constexpr const char* ASIC::GetGroupInLNAOpPointCommand(const Group group) noexcept {
 
-
+    return "";
 
 }
 
 constexpr const char* ASIC::GetCWCapacitanceCommand() noexcept {
 
-
+    return "";
 
 }
 
 constexpr const char* ASIC::RecvSingleElemCommand() noexcept {
 
+    return "";
 
 }
 
@@ -275,69 +283,102 @@ constexpr const char* ASIC::GetTemperatureCommand() noexcept{
 
 constexpr const char* ASIC::RecvGroupCommand() noexcept {
 
+    return "";
 }
 
 constexpr const char* ASIC::EchoSingleCommand() noexcept {
+
+    return "";
 
 }
 
 constexpr const char* ASIC::FireSingleElemCommand() noexcept {
 
+    return "";
+
 }
 
 constexpr const char* ASIC::FireGroupCommand() noexcept {
+
+    return "";
 
 }
 
 constexpr const char* ASIC::FireASICCommand() noexcept {
 
+    return "";
+
 }
 
 constexpr const char* ASIC::EchoASICCommand() noexcept {
+
+    return "";
 
 }
 
 constexpr const char* ASIC::EchoGroupCommand() noexcept {
 
+    return "";
+
 }
 
 constexpr const char* ASIC::EchoASICUpdateCommand() noexcept{
+
+    return "";
 
 }
 
 constexpr const char* ASIC::EchoASICCoeffCommand() noexcept {
 
+    return "";
+
 }
 
 constexpr const char* ASIC::DynamicEchoGroupCommand() noexcept {
+
+    return "";
 
 }
 
 constexpr const char* ASIC::DynamicEchoASICCommand() noexcept {
 
+    return "";
+
 }
 
 constexpr const char* ASIC::DynamicEchoASICUpdCommand() noexcept {
+
+    return "";
 
 }
 
 constexpr const char* ASIC::SendTestPulseCommand() noexcept {
 
+    return "";
+
 }
 
 constexpr const char* ASIC::ReadTXDelaysCommand() noexcept {
+
+    return "";
 
 }
 
 constexpr const char* ASIC::ReadRXDelaysCommand() noexcept {
 
+    return "";
+
 }
 
 constexpr const char* ASIC::ConfigureASICCommand() noexcept {
 
+    return "";
+
 }
 
 constexpr const char* ASIC::RunTestsCommand() noexcept {
+
+    return "";
 
 }
 

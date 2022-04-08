@@ -21,6 +21,7 @@ namespace SoundCath {
     private:
 
         Controller controller;
+        Params::USParams params;
 
     };
 

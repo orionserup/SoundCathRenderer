@@ -91,11 +91,11 @@ public:
 
 private:
 
-    vtkNew<vtkPoints> points[2];        ///< Two Sets of Points As a Buffer
-    vtkNew<vtkPolyData> volume;         ///< Generate a Volume from the Points
-    vtkNew<vtkPolyDataMapper> mapper;   ///< Point Mapper to Volume 
+    // vtkNew<vtkPoints> points[2];        ///< Two Sets of Points As a Buffer
+    // vtkNew<vtkPolyData> volume;         ///< Generate a Volume from the Points
+    // vtkNew<vtkPolyDataMapper> mapper;   ///< Point Mapper to Volume 
 
-    vtkNew<vtkRenderer> renderer;       ///< Turns the 3D Polygonal data to a viewable object
+    // vtkNew<vtkRenderer> renderer;       ///< Turns the 3D Polygonal data to a viewable object
 
     string filename;                    ///< What File to Save it to If Any
 

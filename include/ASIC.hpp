@@ -13,13 +13,12 @@
 
 #include "Driver.hpp"
 #include "Constants.hpp"
-#include "Parameters.hpp"
 
 #include <Eigen/Dense>
 
 #include <string>
+#include <vector>
 #include <iostream>
-
 namespace SoundCath {
 
 using Eigen::Vector;
@@ -134,14 +133,14 @@ public:
      * \param[in] driver: Reference to a Interface to Talk to the ASIC 
      * \param[in] config: Reference to a Settings Instance To configure the ASIC With
      */
-    ASIC(Driver& driver, const ASICParams& config);
+    ASIC(Driver& driver, const Params::ASICParams& config);
 
     /**
      * \brief Sends the Parameters to the ASIC
      * 
      * \param[in] config: Reference to a ASICParams Object, the parameters to send to the ASIC
      */
-    void SetConfig(const ASICParams& config) { params = config; }
+    void SetConfig(const Params::ASICParams& config);
 
     /**
      * \brief Get the Error Code From the last Operation
@@ -335,7 +334,7 @@ public:
      * \param[in] element: Element to Check
      * \return float: The Capacitance of the Element
      */
-    float GetElementCapacitance(const Element element);
+    float GetElementCapacitance(const Element element) const;
 
     /**
      * \brief Get the Serial Num object
@@ -351,7 +350,7 @@ public:
      * \throws DriverException: If there are any Issues at all on the backend
      * \param[in] serialnum: Serial Number String to Set it To
      */
-    void SetSerialNum(const std::string serialnum);
+    void SetSerialNum(const std::string& serialnum);
 
     /**
      * \brief Get the Band Gap Voltage of the Device
@@ -371,12 +370,28 @@ public:
     bool RunTests() const;
 
     /**
+     * \brief Gets the Number of Beam Forming Groups On the ASIC
+     * 
+     * \return const uint8_t: The Number of Groups on the ASIC
+     */
+    static const uint8_t NumGroups() noexcept { return 64; }
+
+    /**
+     * \brief Gets the number of Elements on the ASIC
+     * 
+     * \return const uint16_t: The Number of Elements on the ASIC 
+     */
+    static const uint16_t NumElements() noexcept { return 1024; }
+
+    static const std::vector<uint8_t> AllGroups() noexcept;
+
+    /**
      * \brief Gets the Error Code Message According to the Error Code
      * \note Is Evaluated at Compile time
      * \param code: The Error Code
      * \return const char*: The String Associated with the Error Code 
      */
-    static constexpr const char* GetErrorMessage(const Error code) noexcept;
+    static const char* GetErrorMessage(const Error code) noexcept;
 
     /**
      * \brief Gets the Physical Location/Index of an Element with regards to its logical location
@@ -385,13 +400,13 @@ public:
      * \param loc: The logical Element within the group
      * \return Element: The Actual Physical Location
      */
-    static constexpr const Element LookupElement(const Group group, const Elem loc) noexcept;
+    static const Element LookupElement(const Group group, const Elem loc) noexcept;
 
 private:
 
-    Driver& driver;     ///< An Instance of the wrapper for the Oldelft API
-    string serialnum;   ///< The Serial Number
-    ASICParams params;  ///< The parameters of operation, see the docs
+    SoundCath::Driver& driver;      ///< An Instance of the wrapper for the Oldelft API
+    std::string serialnum;          ///< The Serial Number
+    Params::ASICParams params;      ///< The parameters of operation, see the docs
 
     /**
      * \brief Parse the Error Code and throw all of the Errors in the Code

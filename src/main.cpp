@@ -22,15 +22,8 @@
  */
 int main(const int argc, const char* const* const kwargs) {
 
-    SoundCath::ParameterParser parser(argc, kwargs);
-    SoundCath::Params param = parser.GetParams();
 
     SoundCath::UltraSound us;
-
-    SoundCath::Renderer renderer;
-    render.AddUltraSound(us);
-
-    renderer.Render();
 
 
     return 1;

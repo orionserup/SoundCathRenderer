@@ -78,14 +78,14 @@ public:
      * \param error
      * \return constexpr const char* 
      */
-    static constexpr const char* GetErrorMessage(const FPGA::Error error) noexcept;
+    static const char* GetErrorMessage(const FPGA::Error error) noexcept;
 
 private:
 
     Driver& face;             ///< The Physical Interface that is Connected to the FPGA
     std::string version;     ///< The HDL Version
     std::string desc;        ///< Physical Description
-    FPGAParams params;       ///< Parameters for the FPGA
+    Params::FPGAParams params;       ///< Parameters for the FPGA
 
     // ---------------------- Command Helper Functions -------------------------- //
 
@@ -102,6 +102,13 @@ private:
      * \return constexpr const char* 
      */
     static constexpr const char* GetVersionCommand() noexcept;
+
+    /**
+     * \brief Get the Error Command object
+     * 
+     * \return constexpr const char* 
+     */
+    static constexpr const char* GetErrorCommand() noexcept;
 
 
 };

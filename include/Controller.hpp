@@ -17,10 +17,8 @@
 #include <string>
 
 #include "Point.hpp"
-#include "Constants.hpp"
 #include "ASIC.hpp"
 #include "FPGA.hpp"
-#include "Parameters.hpp"
 
 using Eigen::Matrix;
 using Eigen::Vector;
@@ -36,12 +34,19 @@ namespace SoundCath {
  */
 class TXController {
 
+public:
     /**
      * \brief Construct a new TXController object
      * 
      * \param[in] max_distance_mm: Maximum Distance to Transmit to
      */
-    TXController(const ControllerParams& params);
+    TXController(const Params::ControllerParams& params);
+
+    /**
+     * \brief Construct a new TXController object
+     * 
+     */
+    TXController() = default;
 
     /**
      * \brief Generate Delays for the Begining with empty Data
@@ -57,14 +62,14 @@ class TXController {
      * \param[in] resolution_ns:  
      * \return double 
      */
-    double CompressTaylor(const RectPoint& focalpoint, double beamoffset_s, double resolution_ns);
+    double CompressTaylor(const RectPoint& focus);
 
     /**
      * \brief 
      * 
      * \param point 
      */
-    void GenerateDelays(const RectPoint& point);
+    void CalculateDelays(const RectPoint& focus);
     
     /**
      * \brief 
@@ -102,17 +107,28 @@ public:
      * 
      * \param maxdistance_mm 
      */
-    RXController(const ControllerParams& params);
+    RXController(const Params::ControllerParams& params);
+
+    /**
+     * \brief Construct a new RXController object
+     * 
+     */
+    RXController() = default;
 
     /**
      * \brief 
-     * 
-     * \param focalpoint 
-     * \param beanoffset_s 
-     * \param resolution_ns 
-     * \return double 
+     * \throws ControllerException
+     * \param focalpoint
+     * \param rx
      */
-    double CompressTaylor(const RectPoint& focalpoint, const double beanoffset_s, const double resolution_ns);
+    void CompressTaylor(const RectPoint& focalpoint, RxCoeffs& rx) const;
+
+    /**
+     * \brief 
+     * \throws ControllerException
+     * \param focalpoint
+     */
+    void CompressTaylor(const RectPoint& focalpoint);
 
     /**
      * \brief 
@@ -143,6 +159,13 @@ public:
     void UncompressTaylorDyn();
 
     /**
+     * \brief 
+     * 
+     * \param focus
+     */
+    void CalculateDelays(const RectPoint& focus);
+
+    /**
      * \brief Get the Dyn Rx Data object
      * 
      * \return DynRxData& 
@@ -151,11 +174,12 @@ public:
 
 private:
     
-    std::queue<DynRxData> dyndata;  ///< A Queue Of Dynamic RX Data
-    std::queue<RxCoeffs> coeffs;    ///< A Queue of Coefficients to Send to the FPGA/ASIC
-    std::queue<Delays> delays;                ///< Delays to Send to the FPGA/ASIC
-    std::queue<GroupPhases> phases;                ///< Phases to Send to the FPGA/ASIC
-    double maxdistance_mm{5.0};     ///< Maximum Distance to recieve from
+    DynRxData dyndata;  ///< A Queue Of Dynamic RX Data
+    RxCoeffs coeffs;    ///< A Queue of Coefficients to Send to the FPGA/ASIC
+    Delays delays;                ///< Delays to Send to the FPGA/ASIC
+    GroupPhases phases;                ///< Phases to Send to the FPGA/ASIC
+
+    Params::ControllerParams::RxControllerParams params;
 
 };
 
@@ -166,12 +190,6 @@ private:
 class Controller {
 
 public:
-
-    /**
-     * \brief Construct a new Controller object
-     * 
-     */
-    Controller(const Driver& face);
 
     /**
      * \brief Construct a new Controller object
@@ -213,15 +231,10 @@ public:
 
 private:
 
-    Driver& face; ///< Interface to Send the Commands through
+    TXController tx;    ///< Transmssion Controller
+    RXController rx;    ///< Receiving Controller
 
-    TXController tx;///< Transmssion Controller
-    RXController rx;///< Receiving Controller
-    
-    ASIC asic;      ///< The ASIC to Control 
-    FPGA fpga;      ///< The FPGA to Control
-
-    ControllerParams params; ///< Parameters for Running
+    Params::ControllerParams params; ///< Parameters for Running
     
 };
 

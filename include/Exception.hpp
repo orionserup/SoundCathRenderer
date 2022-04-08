@@ -33,6 +33,8 @@ public:
      */
     ASICException(const ASIC::Error error);
 
+    virtual ~ASICException(){}
+
     /**
      * \brief Returns the Error Message
      * 
@@ -61,6 +63,8 @@ public:
      */
     DriverException(const Driver::Error error);
     
+    virtual ~DriverException() {}
+
     /**
      * \brief Gets the String Associated with the Error
      * 
@@ -89,6 +93,8 @@ public:
      */
     ControllerException(const char* message);
 
+    virtual ~ControllerException() {}
+
     /**
      * \brief 
      * 
@@ -112,6 +118,8 @@ public:
      * \param[in] error
      */
     FPGAException(const FPGA::Error error);
+
+    virtual ~FPGAException() {}
 
     /**
      * \brief 

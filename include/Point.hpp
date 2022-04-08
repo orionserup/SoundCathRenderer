@@ -173,31 +173,25 @@ public:
     RectPoint(double x = 0.0f, double y = 0.0f, double z = 0.0f);
 
     /**
-     * \brief Destroy the Rect Point object
+     * \brief 
      * 
+     * \return double 
      */
-    ~RectPoint();
+    double GetX() const noexcept { return this->x; };
 
     /**
      * \brief 
      * 
      * \return double 
      */
-    double GetX();
+    double GetY() const noexcept { return this->y; } 
 
     /**
      * \brief 
      * 
      * \return double 
      */
-    double GetY();
-
-    /**
-     * \brief 
-     * 
-     * \return double 
-     */
-    double GetZ();
+    double GetZ() const noexcept { return this->z; }
 
     /**
      * \brief 

@@ -14,7 +14,7 @@
 
 using SoundCath::FPGA;
 
-inline constexpr const char* FPGA::GetErrorMessage(const FPGA::Error error) noexcept {
+const char* FPGA::GetErrorMessage(const FPGA::Error error) noexcept {
 
     switch(error) {
 
@@ -72,7 +72,7 @@ FPGA::FPGA(Driver& face): face(face) {
         this->version = face.GetResult(); // get the result from the result string
 
     }
-    catch(const std::exception e) {
+    catch(const std::exception& e) {
 
         std::cerr << "Error While Initializing FPGA:: " << e.what();
         exit(1);
@@ -80,3 +80,14 @@ FPGA::FPGA(Driver& face): face(face) {
     }
 }
 
+constexpr const char* FPGA::GetDescriptionCommand() noexcept {
+
+    return "FPGADescription";
+
+}
+
+constexpr const char* FPGA::GetVersionCommand() noexcept {
+
+    return "FPGAVersion";
+
+}

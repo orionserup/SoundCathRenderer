@@ -17,7 +17,7 @@ This Project is a real time renderer for Oldelft Ultrasound Boxes and Catheters.
 - [VTK](https://gitlab.kitware.com/vtk/vtk) For the Rendering and Visualization
 - [CMake](https://cmake.org/) For building and Installing
 
-## _Optional Dependencies_
+## Optional Dependencies
 
 - [Catch2](https://github.com/catchorg/Catch2) For Testing and Verification
 
