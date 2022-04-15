@@ -37,9 +37,9 @@ Driver::Driver() {}
 
 void Driver::Send(const std::string& command) const {
 
-    Error result = Error(0);//asic_call_parse(command, outbuffer.data());
+    DriverError::Code result = DriverError::OK; //asic_call_parse(command, outbuffer.data());
 		
-    if (!result) ThrowErrors(result);
+    if (result) DriverError::ThrowErrors(result);
 
 }
 
@@ -50,11 +50,12 @@ Driver::~Driver() {
 
 }
 
+using SoundCath::DriverError;
 
 /**
  * \brief Gets the error Message Cooresponding with the Error at compile time
  */
-const char* Driver::GetErrorMessage(Driver::Error error) noexcept{
+const char* DriverError::GetErrorMessage(DriverError::Code error) noexcept{
 
     switch (error) {
 
@@ -88,7 +89,7 @@ const char* Driver::GetErrorMessage(Driver::Error error) noexcept{
     }
 }
 
-void Driver::ThrowErrors(const Driver::Error error) const {
+void DriverError::ThrowErrors(const DriverError::Code error) {
 
     if(error & FAILED) throw DriverException(FAILED);
     if(error & PARAM) throw DriverException(PARAM);

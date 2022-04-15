@@ -22,10 +22,14 @@
  */
 int main(const int argc, const char* const* const kwargs) {
 
+    constexpr SoundCath::USParams usparams{};
+    constexpr SoundCath::ControllerParams conparams{};
 
-    SoundCath::UltraSound us;
+    SoundCath::UltraSound<usparams, conparams> us;
 
-
+    SoundCath::Renderer renderer;
+    SoundCath::GUI gui;
+    
     return 1;
 
 }

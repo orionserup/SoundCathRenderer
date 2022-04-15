@@ -30,8 +30,9 @@ const char* ControllerException::what() const noexcept {
 }
 
 using SoundCath::ASICException;
+using SoundCath::ASICError;
 
-ASICException::ASICException(const ASIC::Error error) {
+ASICException::ASICException(const ASICError::Code error) {
 
     assert(error); // if the error code is zero its not an error
 
@@ -39,15 +40,16 @@ ASICException::ASICException(const ASIC::Error error) {
 
 }
 
+
 const char* ASICException::what() const noexcept {
 
-    return ASIC::GetErrorMessage(this->error);
+    return ASICError::GetErrorMessage(this->error);
 
 }
 
 using SoundCath::DriverException;
 
-DriverException::DriverException(const Driver::Error error) {
+DriverException::DriverException(const DriverError::Code error) {
 
     assert(error); // a zero code isnt an error
 
@@ -57,13 +59,13 @@ DriverException::DriverException(const Driver::Error error) {
 
 const char* DriverException::what() const noexcept {
 
-    return Driver::GetErrorMessage(this->error);
+    return DriverError::GetErrorMessage(this->error);
 
 }
 
 using SoundCath::FPGAException;
 
-FPGAException::FPGAException(const FPGA::Error error) {
+FPGAException::FPGAException(const FPGAError::Code error) {
 
     assert(error);
 
@@ -73,7 +75,7 @@ FPGAException::FPGAException(const FPGA::Error error) {
 
 const char* FPGAException::what() const noexcept {
 
-    return FPGA::GetErrorMessage(this->error);
+    return FPGAError::GetErrorMessage(this->error);
 
 }
 

@@ -35,6 +35,54 @@ typedef int (_stdcall *f_dllfunction)(char *inString, char *outString);
 namespace SoundCath {
 
 /**
+ * \brief 
+ * 
+ */
+struct DriverError {
+
+    /**
+    * \brief Error Codes for the Driver Interface
+    */
+    enum Code : uint32_t {
+        OK = 0,                    ///< Command Went Smoothly
+        FAILED = 1,               ///< The Command Failed
+        PARAM = 1 << 1,           ///< Bad Paramaters
+        PARAMSET = 1 << 2,        ///< Bad Parameter Sets
+        STATUS = 1 << 3,          ///< Driver is in a Bad State
+        USB_INIT = 1 << 4,        ///< The USB Wasn't Initialized
+        USB_RECEIVE = 1 << 5,     ///< The USB Received Bad Data
+        USB_SEND = 1 << 6,        ///< The USB Didn't Send Correctly
+        NOT_IMPLEMENTED = 1 << 7, ///< The Functionality is Not Implemented
+        CRC = 1 << 8,             ///< CRC Detected a Data Error
+        FPGAERROR = 1 << 9,       ///< There was an Error in the FPGA
+        SWINTERNAL = 1 << 10,     ///< There was an Internal Error
+        ASICERROR = 1 << 16       ///< There was an error in the ASIC
+
+    };
+
+    Code error;     ///< The Actual Error Code
+
+    /**
+     * \brief Get the Error Message From the Error Code
+     * 
+     * \param[in] error
+     * \return const char*: The Error Message as a String
+     */
+    static const char* GetErrorMessage(const Code error) noexcept;
+
+    /**
+     * \brief Throws the errors cooresponding to a set uint32_t return code
+     * \throws DriverException: Because thats the Point
+     * \param[in] error: Error Code, combination of different Errors to Parse
+     * 
+     * The Error Codes are stored as bits, so all of the bits that are set in the integer return code represent 
+     * a different error, so we just check the bits that are set and throw the cooresponding exceptions
+     */
+    static void ThrowErrors(const Code error); 
+
+};
+
+/**
  * \brief  ASIC interfacer class
  * \note   A wrapper for the Oldeft API
  */
@@ -97,34 +145,6 @@ public:
      */
     std::string GetOutString() const noexcept { return std::string(outbuffer.data()); }
 
-    /**
-    * \brief Error Codes for the Driver Interface
-    */
-    enum Error : uint32_t {
-
-        FAILED = 1,               ///< The Command Failed
-        PARAM = 1 << 1,           ///< Bad Paramaters
-        PARAMSET = 1 << 2,        ///< Bad Parameter Sets
-        STATUS = 1 << 3,          ///< Driver is in a Bad State
-        USB_INIT = 1 << 4,        ///< The USB Wasn't Initialized
-        USB_RECEIVE = 1 << 5,     ///< The USB Received Bad Data
-        USB_SEND = 1 << 6,        ///< The USB Didn't Send Correctly
-        NOT_IMPLEMENTED = 1 << 7, ///< The Functionality is Not Implemented
-        CRC = 1 << 8,             ///< CRC Detected a Data Error
-        FPGAERROR = 1 << 9,       ///< There was an Error in the FPGA
-        SWINTERNAL = 1 << 10,     ///< There was an Internal Error
-        ASICERROR = 1 << 16       ///< There was an error in the ASIC
-
-    };
-
-    /**
-     * \brief Get the Error Message From the Error Code
-     * 
-     * \param[in] error
-     * \return const char*: The Error Message as a String
-     */
-    static const char* GetErrorMessage(const Error error) noexcept;
-
 private:
 
     #ifdef _WIN32
@@ -132,17 +152,7 @@ private:
     HINSTANCE dll;                      ///< Handle for the DLL
     #endif                              
 
-    std::array<char, UINT16_MAX> outbuffer;    ///< Data Buffer For the output data, 65kB wide
-
-    /**
-     * \brief Throws the errors cooresponding to a set uint32_t return code
-     * \throws DriverException: Because thats the Point
-     * \param[in] error: Error Code, combination of different Errors to Parse
-     * 
-     * The Error Codes are stored as bits, so all of the bits that are set in the integer return code represent 
-     * a different error, so we just check the bits that are set and throw the cooresponding exceptions
-     */
-    void ThrowErrors(const Error error) const;      
+    std::array<char, UINT16_MAX> outbuffer;    ///< Data Buffer For the output data, 65kB wide     
 
     /**
      * \brief Get the Version Command object

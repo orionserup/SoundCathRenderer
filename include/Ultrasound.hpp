@@ -15,13 +15,13 @@
 
 namespace SoundCath {
     
+    template<USParams params, ControllerParams conparams>
     class UltraSound {
 
 
     private:
 
-        Controller controller;
-        Params::USParams params;
+        Controller<conparams> controller;
 
     };
 

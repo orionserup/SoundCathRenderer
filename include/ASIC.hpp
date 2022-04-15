@@ -12,20 +12,20 @@
 #pragma once 
 
 #include "Driver.hpp"
-#include "Constants.hpp"
 
 #include <Eigen/Dense>
 
 #include <string>
 #include <vector>
 #include <iostream>
+#include <array>
 namespace SoundCath {
 
 using Eigen::Vector;
 using Eigen::Matrix;
 
 /// Delay Values for a Group
-typedef Vector<int8_t, GROUPELEMENTS> GroupDelays;
+typedef Vector<int8_t, 16> GroupDelays;
 /// Phase Offsets 
 typedef GroupDelays GroupPhases;
 
@@ -39,7 +39,7 @@ typedef GroupDelays GroupPhases;
 std::ostream& operator<<(std::ostream& os, const GroupDelays& rx);
 
 /// Delays for the Whole Transducer Array
-typedef Matrix<int8_t, NUMGROUPS, GROUPELEMENTS> Delays;
+typedef Matrix<int8_t, 64, 16> Delays;
 
 /**
  * \brief Prints A Delay to a Stream
@@ -61,7 +61,7 @@ std::istream& operator>>(std::istream& is, Delays& delays);
 
 // Taylor Coefficient Types
 /// Taylor Transmission Coefficients
-typedef Vector<int16_t, 8> TxCoeffs;
+typedef std::array<int16_t, 8> TxCoeffs;
 /**
  * \brief Formats Transmission Taylor Coefficents to A Stream/String
  * \throws ios_base::failure: If the Coefficients cant be Formatted
@@ -72,7 +72,7 @@ typedef Vector<int16_t, 8> TxCoeffs;
 std::ostream& operator<<(std::ostream& os, const TxCoeffs& tx);
 
 /// Taylor Receiving Coefficients
-typedef Vector<int16_t, 10> RxCoeffs;
+typedef std::array<int16_t, 10> RxCoeffs;
 
 /**
  * \brief Formats Taylor Transmission Coefficients To A String/Stream
@@ -98,18 +98,13 @@ typedef struct {
 
 } Element;
 
-/**
- * \brief Container Class for the ASIC functionality
- */
-class ASIC {
-
-public:
+struct ASICError {
 
     /**
-     * \brief Error Codes that are For the ASIC
-     * 
-     */
-    enum Error : uint8_t {
+    * \brief Error Codes that are For the ASIC
+    * 
+    */
+    enum Code : uint8_t {
 
         UNKNOWN_CMD = 1 << 0,   ///< Unknown Command
         VALID_ERROR = 1 << 1 ,  ///< A Random Error
@@ -117,8 +112,30 @@ public:
         BUSY = 1 << 3,          ///< The ASIC is Busy
         LOCKED = 1 << 6,        ///< The ASIC is Locked
         EXTERNAL = 1 << 7       ///< An External Error Occured
-
     };
+
+    Code error; ///< The Actual Error Code
+
+    /**
+     * \brief Gets the Error Code Message According to the Error Code
+     * \note Is Evaluated at Compile time
+     * \param code: The Error Code
+     * \return const char*: The String Associated with the Error Code 
+     */
+    static const char* GetErrorMessage(const Code code) noexcept;
+
+    /**
+     * \brief Parse the Error Code and throw all of the Errors in the Code
+     * \throws ASICException: Thats the Whole Point of the Function
+     */
+    void ThrowErrors(const Code error) const;
+};
+
+
+template<ASICParams params>
+class ASIC {
+
+public:
 
     /**
      * \brief Construct a new ASIC object
@@ -128,26 +145,11 @@ public:
     ASIC(Driver& driver);
 
     /**
-     * \brief Construct a new ASIC object
-     * 
-     * \param[in] driver: Reference to a Interface to Talk to the ASIC 
-     * \param[in] config: Reference to a Settings Instance To configure the ASIC With
-     */
-    ASIC(Driver& driver, const Params::ASICParams& config);
-
-    /**
-     * \brief Sends the Parameters to the ASIC
-     * 
-     * \param[in] config: Reference to a ASICParams Object, the parameters to send to the ASIC
-     */
-    void SetConfig(const Params::ASICParams& config);
-
-    /**
      * \brief Get the Error Code From the last Operation
      * 
      * \return ASICError: The Error Code of the Last Operation
      */
-    ASIC::Error GetError() const;
+    ASICError::Code GetError() const;
 
     // ------------------------- Fire Commands ---------------------- //
 
@@ -374,24 +376,21 @@ public:
      * 
      * \return const uint8_t: The Number of Groups on the ASIC
      */
-    static const uint8_t NumGroups() noexcept { return 64; }
+    static uint8_t NumGroups() noexcept { return uint8_t(0x64); }
 
     /**
      * \brief Gets the number of Elements on the ASIC
      * 
      * \return const uint16_t: The Number of Elements on the ASIC 
      */
-    static const uint16_t NumElements() noexcept { return 1024; }
-
-    static const std::vector<uint8_t> AllGroups() noexcept;
+    static uint16_t NumElements() noexcept { return uint16_t(1024); }
 
     /**
-     * \brief Gets the Error Code Message According to the Error Code
-     * \note Is Evaluated at Compile time
-     * \param code: The Error Code
-     * \return const char*: The String Associated with the Error Code 
+     * \brief 
+     * 
+     * \return const std::vector<uint8_t> 
      */
-    static const char* GetErrorMessage(const Error code) noexcept;
+    static const std::vector<uint8_t> AllGroups() noexcept;
 
     /**
      * \brief Gets the Physical Location/Index of an Element with regards to its logical location
@@ -406,13 +405,6 @@ private:
 
     SoundCath::Driver& driver;      ///< An Instance of the wrapper for the Oldelft API
     std::string serialnum;          ///< The Serial Number
-    Params::ASICParams params;      ///< The parameters of operation, see the docs
-
-    /**
-     * \brief Parse the Error Code and throw all of the Errors in the Code
-     * \throws ASICException: Thats the Whole Point of the Function
-     */
-    void ThrowErrors(const Error error) const;
 
     /**
      * \brief Write the Parameters in the params object to the ASIC

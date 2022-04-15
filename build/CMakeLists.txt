@@ -25,6 +25,8 @@ find_package(VTK COMPONENTS
     RenderingOpenGL2
 )
 
+find_package(gcem REQUIRED)
+
 #---------------------- Compile Options ----------------- #
 
 set(CMAKE_CXX_STANDARD 20)
@@ -69,6 +71,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ../bin)   
 
 target_link_libraries(UltraSound ${VTK_LIBRARIES} Eigen3::Eigen)
+target_link_libraries(UltraSound gcem)
 target_link_libraries(${PROJECT_NAME} UltraSound)
 
 install(TARGETS UltraSound DESTINATION ${CMAKE_INSTALL_LIBRARY_PATH})

@@ -16,10 +16,52 @@
 
 namespace SoundCath {
 
+struct FPGAError {
+
+    /**
+    * \brief 
+    * 
+    */
+    enum Code: uint32_t {
+
+        QSPI = 1 << 0,          ///< Quad SPI Error
+        CLOCK = 1 << 3,         ///< Clock Not Synced
+        FPGA_POW = 1 << 4,      ///< Power is Not Good
+        HV_POW = 1 << 5,        ///< High Voltage Power Source is Not Good
+        LV_POW = 1 << 6,        ///< Low Voltage Power Source is Not Good
+        POW_FAIL = 1 << 7,      ///< Power Failure Shutdown
+        CMD = 1 << 8,           ///< Command Error
+        TRIGGER = 1 << 9,       ///< Trigger Error
+        CLKBUSY = 1 << 10,      ///< Clock is Busy
+        OVERFULL  = 1 << 16,    ///< The Memory is too full
+        FRAME_ERROR = 1 << 17   ///< Frame Memory Error
+
+    };
+
+    Code error;         ///< The Actual Error Code
+
+    /**
+     * \brief Get the Error Message object
+     * 
+     * \param error
+     * \return constexpr const char* 
+     */
+    static const char* GetErrorMessage(const Code error) noexcept;
+
+    /**
+     * \brief 
+     * 
+     * \param code
+     */
+    static void ThrowErrors(const Code code);
+
+};
+
 /**
  * \brief 
  * 
  */
+template<FPGAParams params>
 class FPGA {
 
 public:
@@ -46,46 +88,18 @@ public:
     std::string GetDescription() const { return this->desc; }
 
     /**
-    * \brief 
-    * 
-    */
-    enum Error : uint32_t {
-
-        QSPI = 1 << 0,          ///< Quad SPI Error
-        CLOCK = 1 << 3,         ///< Clock Not Synced
-        FPGA_POW = 1 << 4,      ///< Power is Not Good
-        HV_POW = 1 << 5,        ///< High Voltage Power Source is Not Good
-        LV_POW = 1 << 6,        ///< Low Voltage Power Source is Not Good
-        POW_FAIL = 1 << 7,      ///< Power Failure Shutdown
-        CMD = 1 << 8,           ///< Command Error
-        TRIGGER = 1 << 9,       ///< Trigger Error
-        CLKBUSY = 1 << 10,      ///< Clock is Busy
-        OVERFULL  = 1 << 16,    ///< The Memory is too full
-        FRAME_ERROR = 1 << 17   ///< Frame Memory Error
-
-    };
-
-    /**
      * \brief Get the Error object
      * 
      * \return Error 
      */
-    Error GetError() const;
+    FPGAError::Code GetError() const;
 
-    /**
-     * \brief Get the Error Message object
-     * 
-     * \param error
-     * \return constexpr const char* 
-     */
-    static const char* GetErrorMessage(const FPGA::Error error) noexcept;
 
 private:
 
     Driver& face;             ///< The Physical Interface that is Connected to the FPGA
     std::string version;     ///< The HDL Version
     std::string desc;        ///< Physical Description
-    Params::FPGAParams params;       ///< Parameters for the FPGA
 
     // ---------------------- Command Helper Functions -------------------------- //
 

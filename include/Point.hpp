@@ -177,21 +177,21 @@ public:
      * 
      * \return double 
      */
-    double GetX() const noexcept { return this->x; };
+    constexpr double GetX() const noexcept { return this->x; };
 
     /**
      * \brief 
      * 
      * \return double 
      */
-    double GetY() const noexcept { return this->y; } 
+    constexpr double GetY() const noexcept { return this->y; } 
 
     /**
      * \brief 
      * 
      * \return double 
      */
-    double GetZ() const noexcept { return this->z; }
+    constexpr double GetZ() const noexcept { return this->z; }
 
     /**
      * \brief 
@@ -313,7 +313,7 @@ public:
      * 
      * \return double 
      */
-    double GetR();
+    constexpr double GetR() const noexcept { return r; }
 
     /**
      * \brief 

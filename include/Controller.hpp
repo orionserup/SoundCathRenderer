@@ -15,6 +15,7 @@
 #include <vector>
 #include <queue>
 #include <string>
+#include <utility>
 
 #include "Point.hpp"
 #include "ASIC.hpp"
@@ -32,15 +33,10 @@ namespace SoundCath {
  * \brief Controller for the Transission, generates the Appropiate Delays and Coefficients
  * 
  */
+template<ControllerParams::TxParams params>
 class TXController {
 
 public:
-    /**
-     * \brief Construct a new TXController object
-     * 
-     * \param[in] max_distance_mm: Maximum Distance to Transmit to
-     */
-    TXController(const Params::ControllerParams& params);
 
     /**
      * \brief Construct a new TXController object
@@ -49,10 +45,11 @@ public:
     TXController() = default;
 
     /**
-     * \brief Generate Delays for the Begining with empty Data
+     * \brief 
      * 
+     * \return constexpr TXDelays 
      */
-    void PreCalcTxDelays();
+    constexpr Delays PreCalcDelays();
 
     /**
      * \brief Generate The Taylor Polynomial for the Given Parameters
@@ -62,7 +59,17 @@ public:
      * \param[in] resolution_ns:  
      * \return double 
      */
-    double CompressTaylor(const RectPoint& focus);
+    void CompressTaylor(const RectPoint& focus);
+
+    /**
+     * \brief 
+     * 
+     * \param x
+     * \param y
+     * \param z
+     * \return constexpr TxCoeffs 
+     */
+    constexpr TxCoeffs CompressTaylor(const double x, const double y, const double z);
 
     /**
      * \brief 
@@ -70,6 +77,16 @@ public:
      * \param point 
      */
     void CalculateDelays(const RectPoint& focus);
+
+    /**
+     * \brief 
+     * 
+     * \param x
+     * \param y
+     * \param z
+     * \return constexpr Delays 
+     */
+    static constexpr Delays CalculateDelays(const double x, const double y, const double z);
     
     /**
      * \brief 
@@ -79,9 +96,9 @@ public:
 
     void AddDelayToQueue(const Delays& delay);
 
-    std::queue<Delays> GetDelayQueue() const { return this->delays; }
+    std::queue<Delays>& GetDelayQueue() { return this->delays; }
 
-    std::queue<TxCoeffs> GetCoeffQueue() const { return this->coeffs; };
+    std::queue<TxCoeffs>& GetCoeffQueue() { return this->coeffs; };
 
 private:
 
@@ -98,16 +115,15 @@ struct DynRxData {
 
 };
 
+/**
+ * \brief 
+ * 
+ * \tparam params 
+ */
+template<ControllerParams::RxParams params>
 class RXController {
 
 public:
-
-    /**
-     * \brief Construct a new RXController object
-     * 
-     * \param maxdistance_mm 
-     */
-    RXController(const Params::ControllerParams& params);
 
     /**
      * \brief Construct a new RXController object
@@ -121,14 +137,23 @@ public:
      * \param focalpoint
      * \param rx
      */
-    void CompressTaylor(const RectPoint& focalpoint, RxCoeffs& rx) const;
+    void CompressTaylor(const RectPoint& focus, RxCoeffs& rx) const noexcept;
 
     /**
      * \brief 
      * \throws ControllerException
      * \param focalpoint
      */
-    void CompressTaylor(const RectPoint& focalpoint);
+    void CompressTaylor(const RectPoint& focus) noexcept;
+
+    /**
+     * \brief 
+     * 
+     * \param focus
+     * \return constexpr RxCoeff 
+     */
+    template<double x, double y, double z>
+    constexpr RxCoeffs CompressTaylor() const noexcept;
 
     /**
      * \brief 
@@ -150,7 +175,14 @@ public:
      * \brief 
      * 
      */
-    void PreCalcRxDelays();
+    constexpr Delays PreCalcDelays() const noexcept;
+
+    /**
+     * \brief 
+     * 
+     * \param delays
+     */
+    void PreCalcDelays(Delays& delays) const noexcept;
     
     /**
      * \brief 
@@ -163,7 +195,7 @@ public:
      * 
      * \param focus
      */
-    void CalculateDelays(const RectPoint& focus);
+    void CalculateDelays(const RectPoint focus);
 
     /**
      * \brief Get the Dyn Rx Data object
@@ -179,7 +211,13 @@ private:
     Delays delays;                ///< Delays to Send to the FPGA/ASIC
     GroupPhases phases;                ///< Phases to Send to the FPGA/ASIC
 
-    Params::ControllerParams::RxControllerParams params;
+    /**
+     * \brief Get the Assignment Min Max object
+     * 
+     * \param coeffs
+     * \return constexpr std::pair<double, double> 
+     */
+    constexpr std::pair<double, double> GetAssignmentMinMax(const double coeffs[10]) noexcept; //
 
 };
 
@@ -187,6 +225,7 @@ private:
  * \brief 
  * 
  */
+template<ControllerParams params>
 class Controller {
 
 public:
@@ -195,7 +234,7 @@ public:
      * \brief Construct a new Controller object
      * 
      */
-    Controller();
+    Controller() = default;
 
     /**
      * \brief 
@@ -231,10 +270,8 @@ public:
 
 private:
 
-    TXController tx;    ///< Transmssion Controller
-    RXController rx;    ///< Receiving Controller
-
-    Params::ControllerParams params; ///< Parameters for Running
+    TXController<params.txparams> tx;    ///< Transmssion Controller
+    RXController<params.rxparams> rx;    ///< Receiving Controller
     
 };
 

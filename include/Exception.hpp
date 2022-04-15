@@ -31,7 +31,7 @@ public:
      * 
      * \param[in] error: The Error Code to use
      */
-    ASICException(const ASIC::Error error);
+    ASICException(const ASICError::Code error);
 
     virtual ~ASICException(){}
 
@@ -44,7 +44,8 @@ public:
 
 private:
 
-    ASIC::Error error; ///< The Actual Error Code
+    
+    ASICError::Code error; ///< The Actual Error Code
 
 };
 
@@ -61,7 +62,7 @@ public:
      * 
      * \param error: The Error to Give it
      */
-    DriverException(const Driver::Error error);
+    DriverException(const DriverError::Code error);
     
     virtual ~DriverException() {}
 
@@ -74,7 +75,7 @@ public:
 
 private:
 
-    Driver::Error error; ///< The Actual Error
+    DriverError::Code error; ///< The Actual Error
 
 };
 
@@ -117,7 +118,7 @@ public:
      * 
      * \param[in] error
      */
-    FPGAException(const FPGA::Error error);
+    FPGAException(const FPGAError::Code error);
 
     virtual ~FPGAException() {}
 
@@ -130,7 +131,7 @@ public:
 
 private:
 
-    FPGA::Error error;  ///< 
+    FPGAError::Code error;  ///< 
 
 };
 

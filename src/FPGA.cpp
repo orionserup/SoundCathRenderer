@@ -13,8 +13,10 @@
 #include <iostream>
 
 using SoundCath::FPGA;
+using SoundCath::FPGAError;
+using SoundCath::FPGAParams;
 
-const char* FPGA::GetErrorMessage(const FPGA::Error error) noexcept {
+const char* FPGAError::GetErrorMessage(const FPGAError::Code error) noexcept {
 
     switch(error) {
 
@@ -47,7 +49,8 @@ const char* FPGA::GetErrorMessage(const FPGA::Error error) noexcept {
     }
 }
 
-FPGA::Error FPGA::GetError() const {
+template<FPGAParams params>
+FPGAError::Code FPGA<params>::GetError() const {
 
     std::string response = face.Query("GetAsicError");
 
@@ -57,11 +60,12 @@ FPGA::Error FPGA::GetError() const {
 
     uint32_t code = std::stoi(digits, 0, 16); // get the integer value from the hex string
 
-    return (FPGA::Error)code;
+    return (FPGAError::Code)code;
 
 }
 
-FPGA::FPGA(Driver& face): face(face) {
+template<FPGAParams params>
+FPGA<params>::FPGA(Driver& face): face(face) {
 
     try {
 
@@ -80,13 +84,15 @@ FPGA::FPGA(Driver& face): face(face) {
     }
 }
 
-constexpr const char* FPGA::GetDescriptionCommand() noexcept {
+template<FPGAParams params>
+constexpr const char* FPGA<params>::GetDescriptionCommand() noexcept {
 
     return "FPGADescription";
 
 }
 
-constexpr const char* FPGA::GetVersionCommand() noexcept {
+template<FPGAParams params>
+constexpr const char* FPGA<params>::GetVersionCommand() noexcept {
 
     return "FPGAVersion";
 
