@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include "Parameters.hpp"
+
 #include <vtkRenderer.h>
 #include <vtkNew.h>
 
@@ -24,20 +26,6 @@ class GUI {
 
 public:
 
-    /**
-     * \brief Construct a new GUI object
-     * 
-     * \param height
-     * \param width
-     */
-    GUI(uint16_t height, uint16_t width);
-
-    /**
-     * \brief Construct a new GUI object
-     * 
-     * \param renderer
-     */
-    GUI(const Renderer& renderer, const string title = "");
 
     /**
      * \brief Set the Height object
@@ -69,20 +57,6 @@ public:
     void SetRenderer(const Renderer& renderer);
 
     /**
-     * \brief Set the Title object
-     * 
-     * \param title
-     */
-    void SetTitle(const string title);
-
-    /**
-     * \brief 
-     * 
-     * \param fps
-     */
-    void SetFPS(const uint8_t fps);
-
-    /**
      * \brief 
      * 
      */
@@ -91,7 +65,8 @@ public:
 private:
 
     vtkRenderWindow* window;
-    Renderer& renderer;
+    //Renderer& renderer;
+    GUIParams params;
 
 };
 

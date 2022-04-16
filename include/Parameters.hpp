@@ -137,6 +137,11 @@ namespace SoundCath {
 
     };
 
+    struct GUIParams {
+
+
+    };
+
     struct RenderParams {
 
         float fps{20.0f};   ///< The Rendering Frames Per Second

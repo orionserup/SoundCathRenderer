@@ -10,8 +10,8 @@
  */
 
 #include "Renderer.hpp"
-#include "Parameters.hpp"
 #include "Ultrasound.hpp"
+#include "GUI.hpp"
 
 /**
  * \brief 
@@ -29,7 +29,7 @@ int main(const int argc, const char* const* const kwargs) {
 
     SoundCath::Renderer renderer;
     SoundCath::GUI gui;
-    
+
     return 1;
 
 }
