@@ -33,7 +33,7 @@ namespace SoundCath {
  * \brief Controller for the Transission, generates the Appropiate Delays and Coefficients
  * 
  */
-template<ControllerParams::TxParams params>
+template<ControllerParams::TxParams params, TransducerParams usparams>
 class TXController {
 
 public:
@@ -109,9 +109,10 @@ private:
 
 struct DynRxData {
 
-    Vector<double, 8> slope;
-    Vector<double, 8> duration;
-    Vector<double, 9> mastercurve;
+    std::array<double, 8> slope;
+    std::array<double, 8> duration;
+    std::array<double, 9> mastercurve;
+    RxCoeffs coeffs;
 
 };
 
@@ -120,7 +121,7 @@ struct DynRxData {
  * 
  * \tparam params 
  */
-template<ControllerParams::RxParams params>
+template<ControllerParams::RxParams params, TransducerParams usparams>
 class RXController {
 
 public:
@@ -166,16 +167,19 @@ public:
      * 
      * \param x_deg 
      * \param y_deg 
-     * \param runtime 
      * \return double 
      */
-    double CompressTaylorDyn(double x_deg, double y_deg, const uint8_t runtime);
+    void CompressTaylorDyn(const double x_deg, const double y_deg, const uint8_t runtime) const noexcept;
 
     /**
      * \brief 
      * 
+     * \tparam x_deg 
+     * \tparam y_deg 
+     * \return constexpr DynRxData 
      */
-    constexpr Delays PreCalcDelays() const noexcept;
+    template<double x_deg, double y_deg, uint8_t runtime>
+    constexpr DynRxData CompressTaylorDyn() const noexcept;
 
     /**
      * \brief 
@@ -183,6 +187,12 @@ public:
      * \param delays
      */
     void PreCalcDelays(Delays& delays) const noexcept;
+
+    /**
+     * \brief 
+     * 
+     */
+    constexpr Delays PreCalcDelays() const noexcept;
     
     /**
      * \brief 
@@ -225,7 +235,7 @@ private:
  * \brief 
  * 
  */
-template<ControllerParams params>
+template<ControllerParams params, TransducerParams usparams>
 class Controller {
 
 public:
@@ -270,8 +280,8 @@ public:
 
 private:
 
-    TXController<params.txparams> tx;    ///< Transmssion Controller
-    RXController<params.rxparams> rx;    ///< Receiving Controller
+    TXController<params.txparams, usparams> tx;    ///< Transmssion Controller
+    RXController<params.rxparams, usparams> rx;    ///< Receiving Controller
     
 };
 

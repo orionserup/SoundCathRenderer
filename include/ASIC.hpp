@@ -25,7 +25,7 @@ using Eigen::Vector;
 using Eigen::Matrix;
 
 /// Delay Values for a Group
-typedef Vector<int8_t, 16> GroupDelays;
+typedef std::array<int8_t, 16> GroupDelays;
 /// Phase Offsets 
 typedef GroupDelays GroupPhases;
 
@@ -39,7 +39,7 @@ typedef GroupDelays GroupPhases;
 std::ostream& operator<<(std::ostream& os, const GroupDelays& rx);
 
 /// Delays for the Whole Transducer Array
-typedef Matrix<int8_t, 64, 16> Delays;
+typedef std::array<std::array<int8_t, 64>, 16> Delays;
 
 /**
  * \brief Prints A Delay to a Stream
@@ -62,26 +62,10 @@ std::istream& operator>>(std::istream& is, Delays& delays);
 // Taylor Coefficient Types
 /// Taylor Transmission Coefficients
 typedef std::array<int16_t, 8> TxCoeffs;
-/**
- * \brief Formats Transmission Taylor Coefficents to A Stream/String
- * \throws ios_base::failure: If the Coefficients cant be Formatted
- * \param[in] os: Stream to Output To
- * \param[in] tx: Transmission Coefficients to Format
- * \return std::ostream&: A Modified Stream After Getting the data
- */
-std::ostream& operator<<(std::ostream& os, const TxCoeffs& tx);
 
 /// Taylor Receiving Coefficients
 typedef std::array<int16_t, 10> RxCoeffs;
 
-/**
- * \brief Formats Taylor Transmission Coefficients To A String/Stream
- * \throws ios_base::failure: If the Coeffs can't be formatted
- * \param[out] os: Stream To Output To
- * \param[in] rx: Reception Coefficients to Read and Format
- * \return std::ostream&: A Modified Stream With the Formatted String
- */
-std::ostream& operator<<(std::ostream& os, const RxCoeffs& rx);
 
 // Easy Use Types
 /// Represents A Group on the ASIC
@@ -372,20 +356,6 @@ public:
     bool RunTests() const;
 
     /**
-     * \brief Gets the Number of Beam Forming Groups On the ASIC
-     * 
-     * \return const uint8_t: The Number of Groups on the ASIC
-     */
-    static uint8_t NumGroups() noexcept { return uint8_t(0x64); }
-
-    /**
-     * \brief Gets the number of Elements on the ASIC
-     * 
-     * \return const uint16_t: The Number of Elements on the ASIC 
-     */
-    static uint16_t NumElements() noexcept { return uint16_t(1024); }
-
-    /**
      * \brief 
      * 
      * \return const std::vector<uint8_t> 
@@ -405,199 +375,6 @@ private:
 
     SoundCath::Driver& driver;      ///< An Instance of the wrapper for the Oldelft API
     std::string serialnum;          ///< The Serial Number
-
-    /**
-     * \brief Write the Parameters in the params object to the ASIC
-     * \throws DriverException: If there are any Issues at all on the backend
-     */
-    void SetParams();
-
-    // --------------------------- Command Helpers ----------------------- //
-
-    /**
-     * \brief Get the Output Capacitance Command object
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* GetOutputCapacitanceCommand() noexcept;
-
-    /**
-     * \brief Get the Op Point Command object
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* GetOpPointCommand() noexcept;
-
-    /**
-     * \brief Get the Group Capacitance Command object
-     * 
-     * \param group
-     * \return constexpr const char* 
-     */
-    static constexpr const char* GetGroupCapacitanceCommand(const Group group) noexcept;
-
-    /**
-     * \brief Get the Group In L N A Op Point Command object
-     * 
-     * \param group
-     * \return constexpr const char* 
-     */
-    static constexpr const char* GetGroupInLNAOpPointCommand(const Group group) noexcept;
-
-    /**
-     * \brief 
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* GetCWCapacitanceCommand() noexcept;
-
-    /**
-     * \brief 
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* RecvSingleElemCommand() noexcept;
-
-    /**
-     * \brief Get the Band Gap Command object
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* GetBandGapCommand() noexcept;
-
-    /**
-     * \brief Get the Temperature Command object
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* GetTemperatureCommand() noexcept;
-
-    /**
-     * \brief 
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* RecvGroupCommand() noexcept;
-
-    /**
-     * \brief 
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* EchoSingleCommand() noexcept;
-
-    /**
-     * \brief 
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* FireSingleElemCommand() noexcept;
-
-    /**
-     * \brief 
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* FireGroupCommand() noexcept;
-
-    /**
-     * \brief 
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* FireASICCommand() noexcept;
-
-    /**
-     * \brief 
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* EchoASICCommand() noexcept;
-
-    /**
-     * \brief 
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* EchoGroupCommand() noexcept;
-
-    /**
-     * \brief 
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* EchoASICUpdateCommand() noexcept;
-
-    /**
-     * \brief 
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* EchoASICCoeffCommand() noexcept;
-
-    /**
-     * \brief Get the Output Capacitance Command object
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* DynamicEchoGroupCommand() noexcept;
-
-    /**
-     * \brief Get the Output Capacitance Command object
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* DynamicEchoASICCommand() noexcept;
-
-    /**
-     * \brief 
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* DynamicEchoASICUpdCommand() noexcept;
-
-    /**
-     * \brief 
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* SendTestPulseCommand() noexcept;
-
-    /**
-     * \brief 
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* ReadTXDelaysCommand() noexcept;
-
-    /**
-     * \brief Get the Output Capacitance Command object
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* ReadRXDelaysCommand() noexcept;
-
-    /**
-     * \brief Get the Output Capacitance Command object
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* ConfigureASICCommand() noexcept;
-
-    /**
-     * \brief Get the Output Capacitance Command object
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* RunTestsCommand() noexcept;
-
-    /**
-     * \brief Get the Error Command object
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* GetErrorCommand() noexcept;
-
 
 };
 

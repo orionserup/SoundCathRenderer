@@ -17,10 +17,10 @@
 using SoundCath::Driver;
 using SoundCath::DriverException;
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
 #define DLL "..\\..\\lib\\asic_call_wrapper_dll64.dll"
 
-Driver::Driver() v{
+Driver::Driver() {
 
 	this->dll = LoadLibrary(DLL);
 		if (!this->dll) 
@@ -31,7 +31,6 @@ Driver::Driver() v{
         std::cerr << "\tERROR!!  Could Not Access or Find the ASIC Call Function in the DLL\n";
 
 }
-#endif
 
 Driver::Driver() {}
 
@@ -39,8 +38,12 @@ void Driver::Send(const std::string& command) const {
 
     DriverError::Code result = DriverError::OK; //asic_call_parse(command, outbuffer.data());
 		
-    if (result) DriverError::ThrowErrors(result);
+    if (result) {
 
+        DriverError::ThrowErrors(result);
+        std::cerr <<"Sent: " GetOutString();
+    
+    }
 }
 
 Driver::~Driver() {
@@ -49,6 +52,8 @@ Driver::~Driver() {
 	//FreeLibrary(this->dll);
 
 }
+
+#endif
 
 using SoundCath::DriverError;
 

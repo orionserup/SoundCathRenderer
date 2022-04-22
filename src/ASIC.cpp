@@ -11,7 +11,12 @@
 #include "ASIC.hpp"
 #include "Exception.hpp"
 
-#include <sstream>
+#include <string>
+
+#include <fmt/core.h>
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+#include <fmt/compile.h>
 
 using SoundCath::ASIC;
 using SoundCath::ASICError;
@@ -46,7 +51,7 @@ ASIC<params>::ASIC(Driver& driver): driver(driver) {}
 template<ASICParams params>
 ASICError::Code ASIC<params>::GetError() const {
 
-    std::string resp = driver.Query(GetErrorCommand());
+    std::string resp = driver.Query("GetAsicError");
     // Expected: GetASICError:RESULT:ASIC Error Status: 00, FPGA Error Status 00000000
     const static std::string header("ASIC Error Status: ");
     std::string digits = resp.substr(resp.find(header) + header.size(), 2);
@@ -71,69 +76,64 @@ void ASICError::ThrowErrors(const ASICError::Code error) const {
 template<ASICParams params>
 void ASIC<params>::Fire(const Delays& delays) {
 
-    std::ostringstream command;
-
+    static std::string command = fmt::format("FireASIC:{}", delays);
+    this->driver.Send(command);
 
 }
 
 template<ASICParams params>
 void ASIC<params>::Fire(const Group group ,const Delays& tx, const GroupDelays& rx) {
 
-
-
+    static std::string command = fmt::format(FMT_COMPILE("FireASICRecieve:{},{}:{}:{}"), group, group, tx, rx);
+    this->driver.Send(command);
 
 }
 
 template<ASICParams params>
 void ASIC<params>::Fire(const Element elem) {
 
-    std::ostringstream command;
-    command << FireSingleElemCommand() << elem.group << ',' << elem.loc;
-    driver.Send(command.str());
+    static std::string command = fmt::format(FMT_COMPILE("FireSingleElement:{},{}"), elem.group, elem.loc);
+    this->driver.Send(command);
 
 }
 
 template<ASICParams params>
 void ASIC<params>::FireGroup(const Group group, const GroupDelays& tx) {
 
-    std::ostringstream command;
-    command << FireGroupCommand() << group << ':' << tx;
-    driver.Send(command.str());
+    static std::string command = fmt::format(FMT_COMPILE("FireGroup:{},{}"), group, tx);
+    driver.Send(command);
 
 }
 
 template<ASICParams params>
 void ASIC<params>::FireGroup(const Group group, const GroupDelays& tx, const GroupDelays& rx) {
 
-    std::ostringstream command;
-    command << FireGroupCommand() << group << ':' << tx;
-    driver.Send(command.str());
+    static std::string command = fmt::format(FMT_COMPILE("{}:{}:{}"), group, tx, rx);
+    driver.Send(command);
 
 }
 
 template<ASICParams params>
 void ASIC<params>::FireGroup(const Group group, const GroupDelays& tx, const GroupDelays& rx, const Group output) {
 
-    std::ostringstream command;
-    command << FireGroupCommand() << group << ':' << tx;
-    driver.Send(command.str());
+    static std::string command  = fmt::format(FMT_COMPILE("FireGroupRecieve:{0},{0},{}:{}:{}"), group, output, tx, rx);
+    driver.Send(command);
 
 }
 
 template<ASICParams params>
 void ASIC<params>::FireGroup(const Group group, const GroupDelays& tx, const GroupDelays& rx, const GroupPhases& rxphases) {
 
-    std::ostringstream command;
-    command << FireGroupCommand() << group << ':' << tx;
-    driver.Send(command.str());
+    static std::string command = fmt::format(FMT_COMPILE("FireGroupReceiveDyn:{0},{0},{0}:{}:{},{}"), group, tx, rx, rxphases);
+    driver.Send(command);
 
 }
 
 template<ASICParams params>
 void ASIC<params>::ReadTXDelays(Delays& delays) {
 
-    std::string resp{ driver.Query(ReadTXDelaysCommand()) };   
-    std::string delaystr{ resp.substr(resp.find("[ASIC 0]:") + 1)}; // the delay string will be after the ASIC number
+    static std::string resp = driver.Query("ReadTxDelays");   
+    static std::string delaystr = resp.substr(resp.find("[ASIC 0]:") + 1); // the delay string will be after the ASIC number
     std::istringstream output(driver.Recv()); // convert the output to a stream so that it can be converted to delays
     output >> delays; // convert to delays
 
@@ -142,7 +142,7 @@ void ASIC<params>::ReadTXDelays(Delays& delays) {
 template<ASICParams params>
 void ASIC<params>::ReadRXDelays(Delays& delays) {
 
-    std::string resp{ driver.Query(ReadRXDelaysCommand()) };   
+    std::string resp{ driver.Query("ReadRxDelays") };   
     std::string delaystr{ resp.substr(resp.find("[ASIC 0]:") + 1)}; // the delay string will be after the ASIC number
     std::istringstream output(driver.Recv()); // convert the output to a stream so that it can be converted to delays
     output >> delays; // convert to delays and put it into the delay
@@ -152,12 +152,15 @@ void ASIC<params>::ReadRXDelays(Delays& delays) {
 template<ASICParams params>
 void ASIC<params>::RecvElement(const Element elem) {
 
+    (void)elem;
 
 }
 
 template<ASICParams params>
 void ASIC<params>::GetGroupCapacitance(const Group group, std::vector<double>& cap_pf) {
 
+    (void)(group);
+    (void)cap_pf;
 
 }
     
@@ -165,6 +168,7 @@ void ASIC<params>::GetGroupCapacitance(const Group group, std::vector<double>& c
 template<ASICParams params>
 float ASIC<params>::GetElementCapacitance(const Element element) const { 
 
+    (void)element;
     return 0.0f;
 
 }
@@ -197,218 +201,21 @@ bool ASIC<params>::RunTests() const {
 
 }
 
+
 // --------------------------- Utility Functions ------------------------ //
 
 
-std::ostream& SoundCath::operator<<(std::ostream& os, const SoundCath::GroupDelays& rx) {
-
-    return os;
-
-}
-
 std::ostream& SoundCath::operator<<(std::ostream& os, const SoundCath::Delays& delays) {
 
+    (void)delays;
     return os;
 
 }
 
 std::istream& SoundCath::operator>>(std::istream& is, SoundCath::Delays& delays) {
 
+    (void)delays;
     return is;
 
 }
 
-std::ostream& SoundCath::operator<<(std::ostream& os, const SoundCath::TxCoeffs& rx) {
-
-    return os;
-
-}
-
-std::ostream& SoundCath::operator<<(std::ostream& os, const SoundCath::RxCoeffs& rx) {
-
-    return os;
-
-}
-
-// -------------------- Command Functions -------------- //
-
-template<ASICParams params>
-constexpr const char* ASIC<params>::GetOutputCapacitanceCommand() noexcept {
-
-    return "ElementCapacitance:";
-
-}
-
-template<ASICParams params>
-constexpr const char* ASIC<params>::GetOpPointCommand() noexcept {
-
-    return "OutputOpPoint:";
-
-}
-
-template<ASICParams params>
-constexpr const char* ASIC<params>::GetGroupCapacitanceCommand(const Group group) noexcept {
-
-    return "OutputCapacitance:";
-
-}
-
-template<ASICParams params>
-constexpr const char* ASIC<params>::GetGroupInLNAOpPointCommand(const Group group) noexcept {
-
-    return "";
-
-}
-
-template<ASICParams params>
-constexpr const char* ASIC<params>::GetCWCapacitanceCommand() noexcept {
-
-    return "";
-
-}
-
-template<ASICParams params>
-constexpr const char* ASIC<params>::RecvSingleElemCommand() noexcept {
-
-    return "";
-
-}
-
-template<ASICParams params>
-constexpr const char* ASIC<params>::GetBandGapCommand() noexcept {
-
-    return "GetBandGap";
-
-};
-
-template<ASICParams params>
-constexpr const char* ASIC<params>::GetTemperatureCommand() noexcept{
-
-    return "GetTemperature";
-
-}
-
-template<ASICParams params>
-constexpr const char* ASIC<params>::RecvGroupCommand() noexcept {
-
-    return "";
-}
-
-template<ASICParams params>
-constexpr const char* ASIC<params>::EchoSingleCommand() noexcept {
-
-    return "";
-
-}
-
-template<ASICParams params>
-constexpr const char* ASIC<params>::FireSingleElemCommand() noexcept {
-
-    return "";
-
-}
-
-template<ASICParams params>
-constexpr const char* ASIC<params>::FireGroupCommand() noexcept {
-
-    return "";
-
-}
-
-template<ASICParams params>
-constexpr const char* ASIC<params>::FireASICCommand() noexcept {
-
-    return "";
-
-}
-
-template<ASICParams params>
-constexpr const char* ASIC<params>::EchoASICCommand() noexcept {
-
-    return "";
-
-}
-
-template<ASICParams params>
-constexpr const char* ASIC<params>::EchoGroupCommand() noexcept {
-
-    return "";
-
-}
-
-template<ASICParams params>
-constexpr const char* ASIC<params>::EchoASICUpdateCommand() noexcept{
-
-    return "";
-
-}
-
-template<ASICParams params>
-constexpr const char* ASIC<params>::EchoASICCoeffCommand() noexcept {
-
-    return "";
-
-}
-
-template<ASICParams params>
-constexpr const char* ASIC<params>::DynamicEchoGroupCommand() noexcept {
-
-    return "";
-
-}
-
-template<ASICParams params>
-constexpr const char* ASIC<params>::DynamicEchoASICCommand() noexcept {
-
-    return "";
-
-}
-
-template<ASICParams params>
-constexpr const char* ASIC<params>::DynamicEchoASICUpdCommand() noexcept {
-
-    return "";
-
-}
-
-template<ASICParams params>
-constexpr const char* ASIC<params>::SendTestPulseCommand() noexcept {
-
-    return "";
-
-}
-
-template<ASICParams params>
-constexpr const char* ASIC<params>::ReadTXDelaysCommand() noexcept {
-
-    return "";
-
-}
-
-template<ASICParams params>
-constexpr const char* ASIC<params>::ReadRXDelaysCommand() noexcept {
-
-    return "";
-
-}
-
-template<ASICParams params>
-constexpr const char* ASIC<params>::ConfigureASICCommand() noexcept {
-
-    return "";
-
-}
-
-template<ASICParams params>
-constexpr const char* ASIC<params>::RunTestsCommand() noexcept {
-
-    return "";
-
-}
-
-template<ASICParams params>
-constexpr const char* ASIC<params>::GetErrorCommand() noexcept {
-
-    return "ASICError";
-
-}

@@ -24,8 +24,24 @@ find_package(VTK COMPONENTS
     RenderingGL2PSOpenGL2
     RenderingOpenGL2
 )
+if(NOT VTK_FOUND)
+    add_subdirectory(../3rdparty/vtk ../3rdparty/vtk/build)
+endif()
 
-find_package(gcem REQUIRED)
+find_package(gcem)
+if(NOT gcem_FOUND)
+    add_subdirectory(../3rdparty/gcem ../3rdparty/gcem/build)
+endif()
+
+find_package(fmt)
+if(NOT fmt_FOUND)
+    add_subdirectory(../3rdparty/fmt ../3rdparty/fmt/build)
+endif()
+
+find_package(plog)
+if(NOT plog_FOUND)
+    add_subdirectory(../3rdparty/plog ../3rdparty/plog/build)
+endif()
 
 #---------------------- Compile Options ----------------- #
 
@@ -36,13 +52,13 @@ if(MSVC)
 
     set(CMAKE_CXX_FLAGS "/W4 /Wall")
     set(CMAKE_CXX_FLAGS_DEBUG "/DDEBUG /Od /D_DEBUG /DEBUG")
-    set(CMAKE_CXX_FLAGS_RELEASE "/LTCG /Ot /GL")
+    set(CMAKE_CXX_FLAGS_RELEASE "/DNDEBUG /D_NDEBUG /LTCG /Ot /GL")
 
 else()
 
     set(CMAKE_CXX_FLAGS "-Wall -Wextra")
-    set(CMAKE_CXX_FLAGS_DEBUG "-DDEBUG -Og -Wextra -pedantic")
-    set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -Ofast -march=native -mtune=native")
+    set(CMAKE_CXX_FLAGS_DEBUG "-DDEBUG -Og -pedantic")
+    set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -O3 -march=native -mtune=native")
 
 endif()
 
@@ -70,11 +86,20 @@ target_include_directories(${PROJECT_NAME} PUBLIC ../include ${VTK_USE_FILE})
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ../bin)   
 
-target_link_libraries(UltraSound ${VTK_LIBRARIES} Eigen3::Eigen)
+target_link_libraries(UltraSound ${VTK_LIBRARIES}) 
+target_link_libraries(UltraSound Eigen3::Eigen) 
+target_link_libraries(UltraSound fmt::fmt)
 target_link_libraries(UltraSound gcem)
+target_link_libraries(UltraSound plog::plog)
+
 target_link_libraries(${PROJECT_NAME} UltraSound)
 
-install(TARGETS UltraSound DESTINATION ${CMAKE_INSTALL_LIBRARY_PATH})
+include(GNUInstallDirs)
+install(TARGETS UltraSound
+        CONFIGURATIONS Release
+        DESTINATION ${CMAKE_INSTALL_LIBRARY_PATH})
+
+install(FILES ${INCLUDES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/SoundCath)
 
 # ------------- Documentation Generation ------------------ #
 

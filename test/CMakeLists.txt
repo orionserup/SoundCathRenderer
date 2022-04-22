@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 
-include(CTest)
-include(Catch)
-
-find_package(Catch2 3 REQUIRED)
+find_package(Catch2 3)
+if(NOT Catch2_FOUND)
+    add_subdirectory(../3rdparty/Catch ../3rdparty/Catch/build)
+endif()
 
 include_directories(../include)
 

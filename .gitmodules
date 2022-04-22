@@ -7,9 +7,12 @@
 [submodule "3rdparty/Catch"]
 	path = 3rdparty/Catch
 	url = https://github.com/catchorg/Catch2
-[submodule "3rdparty/json2cpp"]
-	path = 3rdparty/json2cpp
-	url = https://github.com/lefticus/json2cpp
 [submodule "3rdparty/gcem"]
 	path = 3rdparty/gcem
 	url = https://github.com/kthohr/gcem
+[submodule "3rdparty/fmt"]
+	path = 3rdparty/fmt
+	url = https://github.com/fmtlib/fmt
+[submodule "3rdparty/plog"]
+	path = 3rdparty/plog
+	url = https://github.com/SergiusTheBest/plog

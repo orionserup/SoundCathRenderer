@@ -40,7 +40,6 @@ ASICException::ASICException(const ASICError::Code error) {
 
 }
 
-
 const char* ASICException::what() const noexcept {
 
     return ASICError::GetErrorMessage(this->error);

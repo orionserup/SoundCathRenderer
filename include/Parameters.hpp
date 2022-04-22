@@ -92,12 +92,70 @@ namespace SoundCath {
 
     };
 
+    struct GUIParams {
+
+
+    };
+
+    struct RenderParams {
+
+        float fps{20.0f};   ///< The Rendering Frames Per Second
+
+    };
+
+    struct TransducerParams {
+
+        double pitch_nm{1.8};       ///< The Element Pitch in the X and Y Direction
+        double group_pitch_nm{7.2}; ///< The Pitch of the Groups in the X and Y Direction
+        double soundspeed{1490.0}; ///< The Speed of Sound
+        uint8_t numgroups{64};
+        uint8_t elempergroup{16};
+        uint16_t numelements{1024};
+
+    };
+
+    struct ControllerParams {
+
+        struct RxParams {
+
+            // Parameters for Standard Delay and Taylor Coeff Calculations
+            uint8_t L0{128};    ///< The First Term Lookup Table Correction Factor       
+            uint16_t L1{1024};  ///< The Second Term Lookup Table Correction Factor
+            uint16_t L2{8192};  ///< The Third Term Lookup Table Correction Factor
+            uint8_t L1MAX{6};   ///< The Maximum Value for the Second Term
+            uint8_t L2MAX{1};   ///< The Maximum Value for the Third Term
+            uint8_t c78factor{16};  ///< Correction Factor for the Seventh and Eigth Coeff
+            
+            // Dynamic Curve Parameters
+            double start_depth_m{.00001};    ///< The Depth to Start Scanning At
+            double stop_depth_m{.0001};    ///< The Depth to End Scanning At
+            double delay_res_ns{20.0}; ///< The Resolution of the ASIC in Nano Seconds
+
+        };
+
+        struct TxParams {
+
+            double group_pitch_nm{7.2}; ///< The Pitch of the Groups in the X and Y Direction
+            double xmax{7.5};
+            double ymax{1.5};
+            uint8_t L1{4};
+            uint8_t L2{64};
+            uint16_t L3{1500};
+            uint8_t L4_sq{32};
+            double delay_res_ns{12.5};
+
+        };
+
+        TxParams txparams;
+        RxParams rxparams;
+
+    };
+
     /**
      * \brief 
      * 
      */
     struct USParams {
-
         struct Pulse {
 
             enum SubType: uint8_t {
@@ -135,43 +193,12 @@ namespace SoundCath {
         Pulse pulse{};        ///< The Pulse Shape and Type
         float attenuation{.5f};  ///< attenuation in dB/MHz*cm , .5 for phantom 1 for water
 
-    };
+        double soundspeed{1490.0}; ///< The Speed of Sound
 
-    struct GUIParams {
-
-
-    };
-
-    struct RenderParams {
-
-        float fps{20.0f};   ///< The Rendering Frames Per Second
-
-    };
-
-    struct ControllerParams {
-
-        struct RxParams {
-
-            uint8_t L0{128};       
-            uint16_t L1{1024};
-            uint16_t L2{8192};
-            uint8_t L1MAX{6};
-            uint8_t L2MAX{1};
-            uint8_t c78factor{16};
-            double soundspeed{1490.0};
-            double pitch_nm{1.8};
-            double group_pitch_nm{7.2};
-            double delay_res_ns{20.0};
-
-        };
-
-        struct TxParams {
-
-
-        };
-
-        TxParams txparams;
-        RxParams rxparams;
+        TransducerParams trparams;
+        ControllerParams conparams;
+        ASICParams asicparams;
+        FPGAParams fpgaparams;
 
     };
 
