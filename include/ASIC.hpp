@@ -25,7 +25,7 @@ using Eigen::Vector;
 using Eigen::Matrix;
 
 /// Delay Values for a Group
-typedef std::array<int8_t, 16> GroupDelays;
+typedef std::array<int8_t, 64> GroupDelays;
 /// Phase Offsets 
 typedef GroupDelays GroupPhases;
 
@@ -39,7 +39,9 @@ typedef GroupDelays GroupPhases;
 std::ostream& operator<<(std::ostream& os, const GroupDelays& rx);
 
 /// Delays for the Whole Transducer Array
-typedef std::array<std::array<int8_t, 64>, 16> Delays;
+typedef std::array<int8_t, 16 * 64> Delays;
+/// Phases for Dynamic Curves
+typedef Delays Phases;
 
 /**
  * \brief Prints A Delay to a Stream
@@ -355,21 +357,7 @@ public:
      */
     bool RunTests() const;
 
-    /**
-     * \brief 
-     * 
-     * \return const std::vector<uint8_t> 
-     */
-    static const std::vector<uint8_t> AllGroups() noexcept;
 
-    /**
-     * \brief Gets the Physical Location/Index of an Element with regards to its logical location
-     * \note Evaluated at Compile Time
-     * \param group: The Logical Group
-     * \param loc: The logical Element within the group
-     * \return Element: The Actual Physical Location
-     */
-    static const Element LookupElement(const Group group, const Elem loc) noexcept;
 
 private:
 

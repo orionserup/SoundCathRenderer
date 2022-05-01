@@ -10,6 +10,7 @@
  */
 #include "FPGA.hpp"
 
+#include <fmt/format.h>
 #include <iostream>
 
 using SoundCath::FPGA;
@@ -69,10 +70,10 @@ FPGA<params>::FPGA(Driver& face): face(face) {
 
     try {
 
-        face.Send(GetDescriptionCommand()); // request the description
+        face.Send("FPGADescription"); // request the description
         this->desc = face.GetResult(); // get the description from what it gives
 
-        face.Send(GetVersionCommand()); // request the version
+        face.Send("FPGAVersion"); // request the version
         this->version = face.GetResult(); // get the result from the result string
 
     }
@@ -84,16 +85,3 @@ FPGA<params>::FPGA(Driver& face): face(face) {
     }
 }
 
-template<FPGAParams params>
-constexpr const char* FPGA<params>::GetDescriptionCommand() noexcept {
-
-    return "FPGADescription";
-
-}
-
-template<FPGAParams params>
-constexpr const char* FPGA<params>::GetVersionCommand() noexcept {
-
-    return "FPGAVersion";
-
-}

@@ -36,7 +36,7 @@ Driver::Driver() {}
 
 void Driver::Send(const std::string& command) const {
 
-    DriverError::Code result = DriverError::OK; //asic_call_parse(command, outbuffer.data());
+    DriverError::Code result = asic_call_parse(command, outbuffer.data());
 		
     if (result) {
 
@@ -52,6 +52,17 @@ Driver::~Driver() {
 	//FreeLibrary(this->dll);
 
 }
+
+#else
+
+Driver::~Driver() {}
+
+void Driver::Send(const std::string& command) const {
+
+    std::cout << command;
+
+}
+/* The end of the ifdef statement. */
 
 #endif
 
@@ -141,28 +152,3 @@ std::string Driver::GetResult() const noexcept {
 
 }
 
-// ---------------------- Command Functions ----------------------- //
-
-constexpr const char* Driver::SetSerialCommand() noexcept {
-
-    return "FTDISetSerial:";
-
-}
-
-constexpr const char* Driver::InitializeCommand() noexcept {
-
-    return "InitializeDriver:";
-
-}
-
-constexpr const char* Driver::GetVersionCommand() noexcept {
-
-    return "DriverVersion:";
-
-}
-
-constexpr const char* Driver::CloseCommand() noexcept {
-
-    return "DriverClose";
-
-}

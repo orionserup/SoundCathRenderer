@@ -83,7 +83,19 @@ void UltraSound<params>::SetParams() const {
     SetParam(group, "UseAnalogReset", params.asicparams.core.LNAAutoPowerDown);
     SetParam(group, "UseAnalogReset", params.asicparams.core.LNAAutoPowerDown);
     
+    group = "BModeSendBeam";
+    SetParam(group, "UseAnalogReset", params.asicparams.core.LNAAutoPowerDown);
+    SetParam(group, "UseAnalogReset", params.asicparams.core.LNAAutoPowerDown);
+    SetParam(group, "UseAnalogReset", params.asicparams.core.LNAAutoPowerDown);
+    SetParam(group, "UseAnalogReset", params.asicparams.core.LNAAutoPowerDown);
+    SetParam(group, "UseAnalogReset", params.asicparams.core.LNAAutoPowerDown);
+    SetParam(group, "UseAnalogReset", params.asicparams.core.LNAAutoPowerDown);
+    
+
     group = "ConfigDRV";
+    SetParam(group, "BiasSel", params.asicparams.core.LNAAutoPowerDown);
+    SetParam(group, "FFen", params.asicparams.core.LNAAutoPowerDown);
+    SetParam(group, "Enable", params.asicparams.core.LNAAutoPowerDown);
 
 }
 

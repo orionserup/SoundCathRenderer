@@ -13,6 +13,9 @@
 #include "Ultrasound.hpp"
 #include "GUI.hpp"
 
+#include "fmt/format.h"
+#include "fmt/ranges.h"
+
 /**
  * \brief 
  * 
@@ -22,14 +25,16 @@
  */
 int main(const int argc, const char* const* const kwargs) {
 
-    constexpr SoundCath::USParams usparams{};
+    (void)argc;
+    (void)kwargs;
+
+    constexpr SoundCath::TransducerParams tparams{};
     constexpr SoundCath::ControllerParams conparams{};
 
-    SoundCath::UltraSound<usparams, conparams> us;
+    static constexpr auto data = SoundCath::Controller<conparams, tparams>::PreCalcScanData();
 
-    SoundCath::Renderer renderer;
-    SoundCath::GUI gui;
+    fmt::print("Data Size: {}", sizeof(data));
 
-    return 1;
+    return 0;
 
 }

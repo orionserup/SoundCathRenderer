@@ -33,7 +33,7 @@ namespace SoundCath {
         Driver driver;
 
         /**
-         * \brief Set the Params object
+         * \brief Set the Params Given in the Template Params 
          * 
          */
         void SetParams() const;
@@ -41,9 +41,9 @@ namespace SoundCath {
         /**
          * \brief Set the Param object
          * 
-         * \param group
-         * \param param
-         * \param value
+         * \param[in] group: The Group the Parameter is In
+         * \param[in] param: The Parameter Name
+         * \param[in] value: The Value To Set it to, will be converted to a String
          */
         void SetParam(const char* const group, const char* const param, const auto& value) const ;
 

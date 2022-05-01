@@ -8,3 +8,26 @@
  * @copyright Copyright (c) 2022
  * 
  */
+
+#pragma once
+
+#include "FPGA.hpp"
+#include "Parameters.hpp"
+
+namespace SoundCath {
+
+template<FPGAParams params>
+
+class FPGATester {
+public:
+
+    
+
+
+private:
+
+    FPGA<params> fpga; ///< FPGA To Test
+
+};
+
+}

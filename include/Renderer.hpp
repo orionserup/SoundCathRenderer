@@ -15,15 +15,9 @@
 #include <array>
 #include <iostream>
 
-#include "Point.hpp"
-
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
-
-using std::array;
-using std::string;
-using std::vector;
 
 namespace SoundCath {
 class Renderer {
@@ -50,7 +44,7 @@ public:
      * 
      * \param filename: File to Save the Video to
      */
-    Renderer(const string filename);
+    Renderer(const std::string filename);
 
     /**
      * \brief 
@@ -64,21 +58,6 @@ public:
      * \retval None
      */
     void Render();
-    
-    /**
-     * \brief  
-     * \note   
-     * \param  point: 
-     * \retval None
-     */
-    void AddPoint(const RectPoint& point);
-
-    /**
-     * \brief Set the Data object
-     * 
-     * \param points
-     */
-    void SetData(const vector<RectPoint>& points);
 
     /**
      * \brief 
@@ -97,7 +76,7 @@ private:
 
     // vtkNew<vtkRenderer> renderer;       ///< Turns the 3D Polygonal data to a viewable object
 
-    string filename;                    ///< What File to Save it to If Any
+    std::string filename;                    ///< What File to Save it to If Any
 
 };
 

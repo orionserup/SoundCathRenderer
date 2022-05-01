@@ -8,3 +8,24 @@
  * @copyright Copyright (c) 2022
  * 
  */
+
+#pragma once 
+
+#include "Renderer.hpp"
+
+namespace SoundCath {
+
+template<RenderParams params>
+class RendererTester {
+public:
+
+
+
+private:
+
+    Rendererer renderer;   ///< The Renderer To Test
+
+};
+
+
+}

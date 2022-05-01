@@ -97,33 +97,9 @@ public:
 
 private:
 
-    Driver& face;             ///< The Physical Interface that is Connected to the FPGA
+    Driver& face;            ///< The Physical Interface that is Connected to the FPGA
     std::string version;     ///< The HDL Version
     std::string desc;        ///< Physical Description
-
-    // ---------------------- Command Helper Functions -------------------------- //
-
-    /**
-     * \brief Get the Description Command object
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* GetDescriptionCommand() noexcept;
-    
-    /**
-     * \brief Get the Version Command object
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* GetVersionCommand() noexcept;
-
-    /**
-     * \brief Get the Error Command object
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* GetErrorCommand() noexcept;
-
 
 };
 

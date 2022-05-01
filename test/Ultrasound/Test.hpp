@@ -10,3 +10,22 @@
  */
 
 #pragma once
+
+#include "Ultrasound.hpp"
+
+namespace SoundCath {
+
+template<USParams params>
+class UltrasoundTester {
+public:
+
+
+
+private:
+
+    UltraSound<params> us; ///< The Ultrasound to Test
+
+};
+
+
+}

@@ -11,7 +11,7 @@
 
 #pragma once 
 
-#include "Interface.hpp"
+#include "Driver.hpp"
 
 namespace SoundCath {
 
@@ -33,7 +33,8 @@ namespace SoundCath {
 
         /**
          * \brief 
-         * 
+         * \test 
+         * \throws DriverException: If the Driver doesn't work for one reason or another
          * \return true 
          * \return false 
          */
@@ -41,7 +42,7 @@ namespace SoundCath {
 
         /**
          * \brief 
-         * 
+         * \test
          * \return true 
          * \return false 
          */
@@ -49,7 +50,7 @@ namespace SoundCath {
 
     private:
 
-        SoundCath::Interface face; ///< The Interface to Test
+        SoundCath::Driver face; ///< The Interface to Test
 
     };
 

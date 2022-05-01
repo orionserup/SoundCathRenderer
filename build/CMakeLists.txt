@@ -48,21 +48,30 @@ endif()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-if(MSVC)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 
-    set(CMAKE_CXX_FLAGS "/W4 /Wall")
+    set(CMAKE_CXX_FLAGS "/W4 /Wall /constexpr /constexpr:steps1000000000")
     set(CMAKE_CXX_FLAGS_DEBUG "/DDEBUG /Od /D_DEBUG /DEBUG")
     set(CMAKE_CXX_FLAGS_RELEASE "/DNDEBUG /D_NDEBUG /LTCG /Ot /GL")
 
 else()
 
-    set(CMAKE_CXX_FLAGS "-Wall -Wextra")
     set(CMAKE_CXX_FLAGS_DEBUG "-DDEBUG -Og -pedantic")
     set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -O3 -march=native -mtune=native")
 
 endif()
 
-file(GLOB SOURCES "../src/*[!main].cpp" "../src/Exception.cpp")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    
+    set(CMAKE_CXX_FLAGS "-Wall -Wextra -fconstexpr-steps=1000000000")
+
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+
+    set(CMAKE_CXX_FLAGS "-Wall -Wextra -fconstexpr-ops-limit=1000000000")
+
+endif()
+
+file(GLOB SOURCES "../src/*[!main].cpp")
 file(GLOB INCLUDES "../include/*.h*")
 
 file(GLOB TESTFILES "../test/*/*.hpp" "../test/*/*.cpp")

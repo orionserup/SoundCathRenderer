@@ -15,12 +15,13 @@
 #include <vector>
 #include <array>
 #include <string>
+#include <string_view>
 
 namespace SoundCath {
 
     struct FPGAParams {
 
-        const char* Name{"Neso Artix 7 FPGA Module"};
+        //const char* const Name{"Neso Artix 7"};
         bool DisableLED{true};
 
     };
@@ -75,12 +76,9 @@ namespace SoundCath {
         struct BModeSettings {
 
             std::array<bool, 64> offgroups{};   ///< The beam forming groups that are inactive
-            float maxangle{30.0f};                          ///< The Maximum Angle of the Beams in the Z plane
-            uint8_t xres{10};                               ///< The Number of Samples Between 0 and the max angle, total number of x Samples are 2*xres + 1
-            uint8_t yres{10};                               ///< The Number of Samples Between 0 and the max angle in the y direction, total samples: 2*yres + 1
-            bool usequeue{true};                            ///< Whether or not to queue up the beams before sending
-            float depthrange{.250f};                        ///< The Range of the Depth
-            float dbrange{40.0f};                           ///< The Power Range
+            bool usequeue{true};                ///< Whether or not to queue up the beams before sending
+            float depthrange{.250f};            ///< The Range of the Depth
+            float dbrange{40.0f};               ///< The Power Range
 
         };
 
@@ -107,10 +105,14 @@ namespace SoundCath {
 
         double pitch_nm{1.8};       ///< The Element Pitch in the X and Y Direction
         double group_pitch_nm{7.2}; ///< The Pitch of the Groups in the X and Y Direction
-        double soundspeed{1490.0}; ///< The Speed of Sound
-        uint8_t numgroups{64};
-        uint8_t elempergroup{16};
-        uint16_t numelements{1024};
+        double soundspeed{1490.0};  ///< The Speed of Sound
+        uint8_t numgroups{64};      ///< The Number of Groups
+        uint8_t ygroups{16};        ///< The Number of Groups in the Y Direction
+        uint8_t xgroups{4};         ///< The Number of Groups  in the X Direction
+        uint8_t xelems{4};          ///< The Number of Elements In Each Group in the X Direction
+        uint8_t yelems{4};          ///< The Number of Elements in Each group in the Y Direction
+        uint8_t elempergroup{16};   ///< The Number of Elements in each Group
+        uint16_t numelements{1024}; ///< The Number of Elements on the Transducer
 
     };
 
@@ -119,17 +121,17 @@ namespace SoundCath {
         struct RxParams {
 
             // Parameters for Standard Delay and Taylor Coeff Calculations
-            uint8_t L0{128};    ///< The First Term Lookup Table Correction Factor       
-            uint16_t L1{1024};  ///< The Second Term Lookup Table Correction Factor
-            uint16_t L2{8192};  ///< The Third Term Lookup Table Correction Factor
-            uint8_t L1MAX{6};   ///< The Maximum Value for the Second Term
-            uint8_t L2MAX{1};   ///< The Maximum Value for the Third Term
+            uint8_t L0{128};        ///< The First Term Lookup Table Correction Factor       
+            uint16_t L1{1024};      ///< The Second Term Lookup Table Correction Factor
+            uint16_t L2{8192};      ///< The Third Term Lookup Table Correction Factor
+            uint8_t L1MAX{6};       ///< The Maximum Value for the Second Term
+            uint8_t L2MAX{1};       ///< The Maximum Value for the Third Term
             uint8_t c78factor{16};  ///< Correction Factor for the Seventh and Eigth Coeff
             
             // Dynamic Curve Parameters
-            double start_depth_m{.00001};    ///< The Depth to Start Scanning At
-            double stop_depth_m{.0001};    ///< The Depth to End Scanning At
-            double delay_res_ns{20.0}; ///< The Resolution of the ASIC in Nano Seconds
+            double start_depth_m{.00001};   ///< The Depth to Start Scanning At
+            double stop_depth_m{.0001};     ///< The Depth to End Scanning At
+            double delay_res_ns{20.0};      ///< The Resolution of the ASIC in Nano Seconds
 
         };
 
@@ -146,8 +148,26 @@ namespace SoundCath {
 
         };
 
-        TxParams txparams;
-        RxParams rxparams;
+        TxParams txparams;          ///< The Transmission Parameters
+        RxParams rxparams;          ///< The Reception Parameters
+
+        double x_max_deg{30.0};     ///< The Max X Direction to Scan
+        double x_min_deg{-30.0};    ///< The Min X Direction to Scan
+        uint8_t x_steps{60};        ///< The How Many Steps in the X Direction
+
+        double y_max_deg{30.0};     ///< The Max Y Direction to Scan
+        double y_min_deg{-30.0};    ///< The Min Y Direction to Scan
+        uint8_t y_steps{60};        ///< The Number of Steps in the Y Direction
+
+        double z_min_mm{10.0};      ///< The Minimum Distance To Scan
+        double z_max_mm{260.0};     ///< The Maximum Distance to Scan
+        double depth_range{250.0};  ///< How Wide we can Scan in the Z Direction
+        uint16_t z_steps{2500};     ///< The Number Steps to Scan in the Z Direction
+
+        double focus_rx{0.0};       ///< Focus for Reception in Meters 0: Dynamic
+        double focus_tx{0.05};      ///< Focus for Tx in Meters 0 : Plane
+
+        bool usedelays{true};       ///< If we are Using Delays or Coefficients
 
     };
 
@@ -190,11 +210,10 @@ namespace SoundCath {
 
         };
 
-        Pulse pulse{};        ///< The Pulse Shape and Type
-        float attenuation{.5f};  ///< attenuation in dB/MHz*cm , .5 for phantom 1 for water
-
-        double soundspeed{1490.0}; ///< The Speed of Sound
-
+        Pulse pulse{};              ///< The Pulse Shape and Type
+        float attenuation{.5f};     ///< attenuation in dB/MHz*cm , .5 for phantom 1 for water
+        double freq_cent_mhz{5.0};  ///< The Center Frequency of the Ultrasound 
+        
         TransducerParams trparams;
         ControllerParams conparams;
         ASICParams asicparams;

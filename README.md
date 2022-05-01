@@ -3,7 +3,6 @@
 ## Brief
 
 This Project is a real time renderer for Oldelft Ultrasound Boxes and Catheters.
-
 ## Authors
 
 - [Orion Serup](orionserup@gmail.com)
@@ -15,7 +14,29 @@ This Project is a real time renderer for Oldelft Ultrasound Boxes and Catheters.
 - [Eigen](https://gitlab.com/libeigen/eigen.git) For the Linear Algebra
 
 - [VTK](https://gitlab.kitware.com/vtk/vtk) For the Rendering and Visualization
+
+- [Plog](https://github.com/SergiusTheBest/plog) For Logging
+
+- [GCEM](https://github.com/kthohr/gcem) For Advanced Compile Time Math
+
+- [fmt](https://github.com/fmtlib/fmt) For Advanced Text Formatting 
+
 - [CMake](https://cmake.org/) For building and Installing
+
+- [ninja](https://github.com/ninja-build/ninja) or [make](https://www.gnu.org/software/make/) or [Visual Studio(Windows Only)](https://visualstudio.microsoft.com/)
+
+## Optional Dependencies
+
+- [Catch2](https://github.com/catchorg/Catch2) For Testing and Verification
+
+- [Doxygen](https://www.doxygen.nl) For Documentation Generation
+
+
+## Getting Started
+
+Either download and install the dependencies or clone this repository recursively, that will install local copies of the dependencies to build and link against
+
+git clone --recursive <this_url>
 
 ## Optional Dependencies
 

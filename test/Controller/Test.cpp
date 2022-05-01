@@ -10,3 +10,7 @@
  */
 
 #include "Test.hpp"
+
+using SoundCath::ControllerTester;
+
+ControllerTester::
