@@ -1,9 +1,6 @@
 [submodule "3rdparty/vtk"]
 	path = 3rdparty/vtk
 	url = https://gitlab.kitware.com/vtk/vtk
-[submodule "3rdparty/eigen"]
-	path = 3rdparty/eigen
-	url = https://gitlab.com/libeigen/eigen
 [submodule "3rdparty/Catch"]
 	path = 3rdparty/Catch
 	url = https://github.com/catchorg/Catch2

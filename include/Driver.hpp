@@ -21,6 +21,7 @@
 #include "Parameters.hpp"
 
 #ifdef _WIN32
+#include<windows.h>
 
 /**
  * \brief  Type definition for the dll imported function for the asic call wrapper

@@ -7,8 +7,6 @@ project(SoundCathRenderer
 
 # --------------------- Dependencies ------------------ #
 
-find_package(Eigen3 3.4 REQUIRED NO_MODULE)
-
 find_package(VTK COMPONENTS
     CommonColor
     CommonCore
@@ -24,23 +22,24 @@ find_package(VTK COMPONENTS
     RenderingGL2PSOpenGL2
     RenderingOpenGL2
 )
+
 if(NOT VTK_FOUND)
-    add_subdirectory(../3rdparty/vtk ../3rdparty/vtk/build)
+    add_subdirectory(${CMAKE_BINARY_DIR}/../3rdparty/vtk ../3rdparty/vtk/build)
 endif()
 
 find_package(gcem)
 if(NOT gcem_FOUND)
-    add_subdirectory(../3rdparty/gcem ../3rdparty/gcem/build)
+    add_subdirectory(${CMAKE_BINARY_DIR}/../3rdparty/gcem ../3rdparty/gcem/build)
 endif()
 
 find_package(fmt)
 if(NOT fmt_FOUND)
-    add_subdirectory(../3rdparty/fmt ../3rdparty/fmt/build)
+    add_subdirectory(${CMAKE_BINARY_DIR}/../3rdparty/fmt ../3rdparty/fmt/build)
 endif()
 
 find_package(plog)
 if(NOT plog_FOUND)
-    add_subdirectory(../3rdparty/plog ../3rdparty/plog/build)
+    add_subdirectory(${CMAKE_BINARY_DIR}/../3rdparty/plog ../3rdparty/plog/build)
 endif()
 
 #---------------------- Compile Options ----------------- #
@@ -50,14 +49,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 
-    set(CMAKE_CXX_FLAGS "/W4 /Wall /constexpr /constexpr:steps1000000000")
+    set(CMAKE_CXX_FLAGS "/W3 /constexpr:steps1000000000 /Zm2000")
     set(CMAKE_CXX_FLAGS_DEBUG "/DDEBUG /Od /D_DEBUG /DEBUG")
-    set(CMAKE_CXX_FLAGS_RELEASE "/DNDEBUG /D_NDEBUG /LTCG /Ot /GL")
+    set(CMAKE_CXX_FLAGS_RELEASE "/DNDEBUG /D_NDEBUG /Ot /GL")
 
 else()
 
     set(CMAKE_CXX_FLAGS_DEBUG "-DDEBUG -Og -pedantic")
-    set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -O3 -march=native -mtune=native")
+    set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -O3 -march=native -mtune=native -flto")
+    set(LINK_FLAGS_RELEASE "-flto")
 
 endif()
 
@@ -80,7 +80,7 @@ set(DOCSOURCES "../src" "../include" "../test/" "../README.md")
 #------------------- Compile Targets --------------------- #
 
 add_library(UltraSound STATIC ${SOURCES})
-target_include_directories(UltraSound PUBLIC ../include)
+target_include_directories(UltraSound PRIVATE ../include)
 
 set_target_properties(UltraSound PROPERTIES
                 ARCHIVE_OUTPUT_DIRECTORY ../lib
@@ -90,16 +90,15 @@ vtk_module_autoinit(TARGETS UltraSound
                     MODULES ${VTK_LIBRARIES})
 
 add_executable(${PROJECT_NAME} ../src/main.cpp)
-target_include_directories(${PROJECT_NAME} PUBLIC ../include ${VTK_USE_FILE})
+target_include_directories(${PROJECT_NAME} PRIVATE ../include ${VTK_USE_FILE})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ../bin)   
 
-target_link_libraries(UltraSound ${VTK_LIBRARIES}) 
-target_link_libraries(UltraSound Eigen3::Eigen) 
-target_link_libraries(UltraSound fmt::fmt)
-target_link_libraries(UltraSound gcem)
-target_link_libraries(UltraSound plog::plog)
+target_link_libraries(UltraSound PUBLIC gcem)
+target_link_libraries(UltraSound PUBLIC fmt)
+target_link_libraries(UltraSound PUBLIC plog)
+target_link_libraries(UltraSound PUBLIC ${VTK_LIBRARIES}) 
 
 target_link_libraries(${PROJECT_NAME} UltraSound)
 

@@ -13,7 +13,6 @@
 
 #include <array>
 #include <vector>
-#include <queue>
 #include <string>
 #include <utility>
 #include <algorithm>
@@ -21,10 +20,11 @@
 #include "ASIC.hpp"
 #include "FPGA.hpp"
 
-#include "gcem.hpp"
+#include <gcem.hpp>
 
-using std::array;
-using std::vector;
+#include <cassert>
+
+#define PI 3.14159265
 
 namespace SoundCath {
 
@@ -292,8 +292,8 @@ public:
         assert(x_deg >= -90.0 && x_deg <= 90.0); // we need to be in the positive direction
         assert(y_deg >= -90.0 && y_deg <= 90.0); 
 
-        const double x_rad = M_PI * x_deg / 180.0; // we need the values to be in radians for the constexpr math
-        const double y_rad = M_PI * y_deg / 180.0;
+        const double x_rad = PI * x_deg / 180.0; // we need the values to be in radians for the constexpr math
+        const double y_rad = PI * y_deg / 180.0;
 
         const double A = gcem::sqrt(1 - gcem::pow(gcem::sin(x_rad), 2) * gcem::pow(gcem::sin(y_rad), 2));
         const double x0 = params.start_depth_m * gcem::sin(x_rad) * gcem::cos(y_rad) / A;
@@ -326,8 +326,8 @@ public:
      */
     static consteval RxDelays<usparams> CalculateDelays(const double x_deg, const double y_deg) noexcept {
 
-        const double x_rad = x_deg * M_PI / 180.0;
-        const double y_rad = y_deg * M_PI / 180.0;
+        const double x_rad = x_deg * PI / 180.0;
+        const double y_rad = y_deg * PI / 180.0;
 
         RxDelays<usparams> delays{};
 
@@ -418,8 +418,8 @@ public:
 
                 double x_deg = (params.x_max_deg - params.x_min_deg) * i / params.x_steps + params.x_min_deg;
                 double y_deg = (params.y_max_deg - params.y_min_deg) * j / params.y_steps + params.y_min_deg;
-                double x_rad = M_PI * x_deg / 180.0;
-                double y_rad = M_PI * y_deg / 180.0;
+                double x_rad = PI * x_deg / 180.0;
+                double y_rad = PI * y_deg / 180.0;
 
                 double A = gcem::sqrt(1 - gcem::pow(gcem::sin(x_rad), 2) * gcem::pow(gcem::sin(y_rad), 2));
                 double txx = params.focus_tx * gcem::sin(x_rad) * gcem::cos(y_rad) / A;

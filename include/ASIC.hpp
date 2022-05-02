@@ -13,16 +13,11 @@
 
 #include "Driver.hpp"
 
-#include <Eigen/Dense>
-
 #include <string>
 #include <vector>
 #include <iostream>
 #include <array>
 namespace SoundCath {
-
-using Eigen::Vector;
-using Eigen::Matrix;
 
 /// Delay Values for a Group
 typedef std::array<int8_t, 64> GroupDelays;
@@ -356,8 +351,6 @@ public:
      * \return false: If one or More Tests Fail
      */
     bool RunTests() const;
-
-
 
 private:
 

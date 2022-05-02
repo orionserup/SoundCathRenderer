@@ -32,16 +32,14 @@ Driver::Driver() {
 
 }
 
-Driver::Driver() {}
-
 void Driver::Send(const std::string& command) const {
 
-    DriverError::Code result = asic_call_parse(command, outbuffer.data());
+    int result = asic_call_parse((char*)command.c_str(), (char*)outbuffer.data());
 		
     if (result) {
 
-        DriverError::ThrowErrors(result);
-        std::cerr <<"Sent: " GetOutString();
+        DriverError::ThrowErrors((DriverError::Code)result);
+        std::cerr << "Sent: " << GetOutString();
     
     }
 }
