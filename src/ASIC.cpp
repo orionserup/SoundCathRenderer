@@ -46,7 +46,20 @@ const char* ASICError::GetErrorMessage(const ASICError::Code code) noexcept {
 }
 
 template<ASICParams params>
-ASIC<params>::ASIC(Driver& driver): driver(driver) {}
+ASIC<params>::ASIC(Driver& driver): driver(driver) {
+
+    InitializeASIC();
+
+
+}
+
+template<ASICParams params>
+ASIC<params>::InitializeASIC() {
+
+    static std::string command = fmt::format(FMT_COMPILE("InitializeASIC:{}"), params.speed);
+    driver.Send(command);
+
+}
 
 
 template<ASICParams params>
@@ -77,13 +90,13 @@ void ASICError::ThrowErrors(const ASICError::Code error) const {
 template<ASICParams params>
 void ASIC<params>::Fire(const Delays& delays) {
 
-    static std::string command = fmt::format("FireASIC:{}", delays);
+    static std::string command = fmt::format(FMT_COMPILE("FireASIC:{}"), delays);
     this->driver.Send(command);
 
 }
 
 template<ASICParams params>
-void ASIC<params>::Fire(const Group group ,const Delays& tx, const GroupDelays& rx) {
+void ASIC<params>::Fire(const Group group, const Delays& tx, const GroupDelays& rx) {
 
     static std::string command = fmt::format(FMT_COMPILE("FireASICRecieve:{},{}:{}:{}"), group, group, tx, rx);
     this->driver.Send(command);
@@ -153,7 +166,15 @@ void ASIC<params>::ReadRXDelays(Delays& delays) {
 template<ASICParams params>
 void ASIC<params>::RecvElement(const Element elem) {
 
-    (void)elem;
+    static std::string command = fmt::format(FMT_COMPILE("ReceiveSingleElement:{},{},{}"), elem.group, elem.loc, elem.group);
+    driver.Send(command);
+
+}
+
+template<ASICParams params>
+void ASIC<params>::RecvGroup(const Group group, const GroupDelays& rxdelays) {
+
+    
 
 }
 

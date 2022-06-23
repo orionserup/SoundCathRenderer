@@ -235,6 +235,14 @@ public:
      */
     void RecvElement(const Element elem);
 
+    /**
+     * \brief 
+     * 
+     * \param[in] group: 
+     * \param[in] delays: 
+     */
+    void RecvGroup(const Group group, const GroupDelays& rxdelays);
+
     //--------------------- Micro Beam Forming Functions --------------------//
 
     /**
@@ -342,6 +350,13 @@ public:
      * \return double: The Band Gap in Volts
      */
     double GetBandGapV() const;
+    
+    /**
+     * \brief Get the Temperature of the ASIC
+     * 
+     * \return double: The Temperature in Kelvin 
+     */
+    double GetTemperature() const;
 
     /**
      * \brief Runs all of the Built in Tests from Oldelft
@@ -353,6 +368,12 @@ public:
     bool RunTests() const;
 
 private:
+
+    /**
+     * \brief 
+     * 
+     */
+    void InitializeASIC() const;
 
     SoundCath::Driver& driver;      ///< An Instance of the wrapper for the Oldelft API
     std::string serialnum;          ///< The Serial Number
