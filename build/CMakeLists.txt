@@ -49,7 +49,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 
-    set(CMAKE_CXX_FLAGS "/W3 /constexpr:steps1000000000 /Zm2000")
+    set(CMAKE_CXX_FLAGS "/W4 /Wall /constexpr /constexpr:steps1000000000 /Zm2000")
     set(CMAKE_CXX_FLAGS_DEBUG "/DDEBUG /Od /D_DEBUG /DEBUG")
     set(CMAKE_CXX_FLAGS_RELEASE "/DNDEBUG /D_NDEBUG /Ot /GL")
 
@@ -95,10 +95,10 @@ target_include_directories(${PROJECT_NAME} PRIVATE ../include ${VTK_USE_FILE})
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ../bin)   
 
-target_link_libraries(UltraSound PUBLIC gcem)
-target_link_libraries(UltraSound PUBLIC fmt)
-target_link_libraries(UltraSound PUBLIC plog)
-target_link_libraries(UltraSound PUBLIC ${VTK_LIBRARIES}) 
+target_link_libraries(UltraSound ${VTK_LIBRARIES}) 
+target_link_libraries(UltraSound fmt::fmt)
+target_link_libraries(UltraSound gcem)
+target_link_libraries(UltraSound plog::plog)
 
 target_link_libraries(${PROJECT_NAME} UltraSound)
 

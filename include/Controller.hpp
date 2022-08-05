@@ -22,9 +22,8 @@
 
 #include <gcem.hpp>
 
-#include <cassert>
-
-#define PI 3.14159265
+using std::array;
+using std::vector;
 
 namespace SoundCath {
 
@@ -110,7 +109,7 @@ public:
     static consteval Delays CalculateDelays(const double x, const double y, const double z) noexcept {
 
         const double r = gcem::sqrt(gcem::pow(x, 2) + gcem::pow(y, 2) + gcem::pow(z, 2));
-        Delays delays;
+        Delays delays{};
 
         for(int yg = 0; yg < usparams.ygroups; yg++) {
 
@@ -147,7 +146,15 @@ public:
      * \brief 
      * 
      */
-    static consteval Delays UncompressTaylor(const TxCoeffs coeffs);
+    static consteval Delays UncompressTaylor(const TxCoeffs coeffs) noexcept {
+
+        Delays delays{};
+
+
+
+        return Delays();
+
+    }
 
     /**
      * \brief Get the Coeffs object
@@ -192,6 +199,14 @@ struct RxDelays {
 
 };
 
+template<TransducerParams usparams>
+struct DecompRxDelays {
+
+    Delays delays;
+    Phases phases;
+
+};
+
 
 /**
  * \brief 
@@ -201,8 +216,15 @@ struct RxDelays {
 template<ControllerParams::RxParams params, TransducerParams usparams>
 class RXController {
 
-private:
+public:
 
+    /**
+     * \brief Get the Assignment Min Max object
+     * 
+     * \param coeffs
+     * \param scale
+     * \return consteval 
+     */
     static consteval std::pair<double, double> GetAssignmentMinMax(const double coeffs[7], const uint8_t scale) {
 
         (void)coeffs;
@@ -221,34 +243,43 @@ public:
      */
     static consteval RxCoeffs CompressTaylor(const double x, const double y, const double z) noexcept {
 
-        assert(x > 0 && y > 0 && z > 0);
+        if(!(x > 0 && y > 0 && z > 0))
+            return RxCoeffs();
 
-        double r = gcem::sqrt(gcem::pow(x, 2) + gcem::pow(y, 2) + gcem::pow(z, 2));
+        double r = gcem::sqrt(gcem::pow(x, 2.0) + gcem::pow(y, 2.0) + gcem::pow(z, 2.0));
         double x_r = x / r;
         double y_r = y / r;  
 
+        const double pitch = usparams.pitch_nm * gcem::pow(10.0, -9);
+        const double gpitch = pitch * usparams.xelems;
+        const double res = params.delay_res_ns * gcem::pow(10.0, -9);
+        const double csound = usparams.soundspeed;
+
         // Find Each Term: Ripped Straight From the ASIC Spec Doc
-        double seventh = (x_r / usparams.soundspeed) * (usparams.pitch_nm) * (params.c78factor/params.delay_res_ns); // 1000  factor to fix the ns and um
-        double eighth = (y_r / usparams.soundspeed) * (usparams.pitch_nm) * (params.c78factor/params.delay_res_ns);
-        double zeroth = (x_r / usparams.soundspeed) * (usparams.pitch_nm/params.delay_res_ns) - (floor(seventh + .5)/params.c78factor) * params.L0; 
-        double first = (1 / r) * (gcem::pow(x_r, 2) - 1)/usparams.soundspeed * (1000.0 * usparams.pitch_nm) * (1000.0 * usparams.group_pitch_nm) * (1000.0 * params.L1)/(params.delay_res_ns); // scaling to prevent loss of accuracy and keeping units
-        double second = (3.0 * gcem::pow(x_r, -2)) * (gcem::pow(x_r, 3) - x_r)/(2 * usparams.soundspeed) * (1000000.0 * usparams.pitch_nm * 1000.0 * usparams.group_pitch_nm * 1000.0 * usparams.group_pitch_nm * 1000000.0 * params.L2)/(params.delay_res_ns); // scaling for accuracy keeping
-        double sixth  = (1 / r) * (x_r * y_r / usparams.soundspeed) * ((1000.0 * usparams.pitch_nm * 1000.0 * usparams.group_pitch_nm * 1000.0 * params.L1) / (params.delay_res_ns));
-        double third = ((y_r / usparams.soundspeed) * (usparams.pitch_nm / params.delay_res_ns) - (gcem::floor(eighth + .5)/ params.c78factor)) * params.L0;
-        double fourth = (1 / r) * ((gcem::pow(y_r, 2) - 1) / usparams.soundspeed) * (1000.0 * usparams.pitch_nm * 1000.0 * usparams.group_pitch_nm * 1000.0 * params.L1) / (params.delay_res_ns);
-        double fifth = (3 * gcem::pow(r, -2) * gcem::pow(y_r, 3) - y_r)/(2 * usparams.soundspeed) * (10000000.0 * usparams.pitch_nm * 1000000.0 * gcem::pow(usparams.group_pitch_nm, 2) * 1000000.0 * params.L2) / params.delay_res_ns;
+        double seventh = x_r / csound * pitch * params.c78factor / res; 
+        double eighth = y_r / csound * pitch * params.c78factor / res;
+
+        double zeroth = (x_r / csound * pitch / res - gcem::floor(seventh + .5) / params.c78factor) * params.L0; 
+        double first = 1.0 / r * (gcem::pow(x_r, 2) - 1) / csound * pitch * gpitch * params.L1 / res; // scaling to prevent loss of accuracy and keeping units
+        double second = 3.0 / gcem::pow(r, 2.0) * (gcem::pow(x_r, 3.0) - x_r) /2  / csound * pitch * gcem::pow(gpitch, 2) * params.L2 / res; // scaling for accuracy keeping
+        double sixth  = 1.0 / r * x_r * y_r / csound * pitch * gpitch * params.L1 / res;
+        double third = (y_r / csound * pitch / res - gcem::floor(eighth + .5)/ params.c78factor) * params.L0;
+        double fourth = 1.0 / r * (gcem::pow(y_r, 2) - 1) / csound * pitch * gpitch * params.L1 / res;
+        double fifth = 3.0 / gcem::pow(r, 2) * (gcem::pow(y_r, 3) - y_r)/2 /csound * pitch * gcem::pow(gpitch, 2) * params.L2 / res;
 
         double terms[] = { zeroth, first, second, third, fourth, fifth, sixth, seventh, eighth };
 
         int i = 1;
-        for(; i <= 16; i*= 2) { // Just see the docs, its only this messy to have it evaluate at compile time
+        for(; i <= 16; i *= 2) { // Just see the docs, its only this messy to have it evaluate at compile time
         
             if(i == 2) continue;
 
-            if((*std::min_element(std::begin(terms), std::end(terms)) >= -128 &&
-                *std::max_element(std::begin(terms), std::end(terms))  <= 127) &&
-                (gcem::floor(RXController<params, usparams>::GetAssignmentMinMax(terms, i).first + .5) > 0 && 
-                gcem::floor(RXController<params, usparams>::GetAssignmentMinMax(terms, i).second + .5) <= 7))
+            if( *std::min_element(std::begin(terms), std::end(terms)) / i < -128.0 || 
+                *std::max_element(std::begin(terms), std::end(terms)) / i > 127.0) 
+                continue;
+            
+            if (gcem::floor(RXController<params, usparams>::GetAssignmentMinMax(terms, i).first + .5) >= 0.0 && 
+                gcem::floor(RXController<params, usparams>::GetAssignmentMinMax(terms, i).second + .5) <= 7.0)
                 break;
         }
 
@@ -256,16 +287,17 @@ public:
 
         const RxCoeffs coeffs { 
 
-            int16_t(gcem::floor(gcem::min(gcem::max(terms[0]/ninth, -128), 127) + .5)),
-            int16_t(gcem::floor(gcem::min(gcem::max(terms[1]/ninth, -128), 127) + .5)),
-            int16_t(gcem::floor(gcem::min(gcem::max(terms[2]/ninth, -128), 127) + .5)),
-            int16_t(gcem::floor(gcem::min(gcem::max(terms[3]/ninth, -128), 127) + .5)),
-            int16_t(gcem::floor(gcem::min(gcem::max(terms[4]/ninth, -128), 127) + .5)),
-            int16_t(gcem::floor(gcem::min(gcem::max(terms[5]/ninth, -128), 127) + .5)),
-            int16_t(gcem::floor(gcem::min(gcem::max(terms[6]/ninth, -128), 127) + .5)),
+            int16_t(gcem::floor(gcem::min(gcem::max(terms[0] / ninth, -128), 127) + .5)),
+            int16_t(gcem::floor(gcem::min(gcem::max(terms[1] / ninth, -128), 127) + .5)),
+            int16_t(gcem::floor(gcem::min(gcem::max(terms[2] / ninth, -128), 127) + .5)),
+            int16_t(gcem::floor(gcem::min(gcem::max(terms[3] / ninth, -128), 127) + .5)),
+            int16_t(gcem::floor(gcem::min(gcem::max(terms[4] / ninth, -128), 127) + .5)),
+            int16_t(gcem::floor(gcem::min(gcem::max(terms[5] / ninth, -128), 127) + .5)),
+            int16_t(gcem::floor(gcem::min(gcem::max(terms[6] / ninth, -128), 127) + .5)),
             int16_t(gcem::floor(gcem::min(gcem::max(terms[7], -128), 127) + .5)),
             int16_t(gcem::floor(gcem::min(gcem::max(terms[8], -128), 127) + .5)),
-            int16_t(gcem::floor(gcem::min(gcem::max(ninth, 0), 255)) + .5)
+            int16_t(gcem::floor(gcem::min(gcem::max(ninth, 0), 255) + .5))
+
         };
 
         return coeffs;
@@ -289,18 +321,18 @@ public:
      */
     static consteval DynRxData CompressTaylorDyn(const double x_deg, const double y_deg, const uint8_t runtime) noexcept {
 
-        assert(x_deg >= -90.0 && x_deg <= 90.0); // we need to be in the positive direction
-        assert(y_deg >= -90.0 && y_deg <= 90.0); 
+        if(!(x_deg >= -90.0 && x_deg <= 90.0) || !(y_deg >= -90.0 && y_deg <= 90.0))
+            return DynRxData();
 
-        const double x_rad = PI * x_deg / 180.0; // we need the values to be in radians for the constexpr math
-        const double y_rad = PI * y_deg / 180.0;
+        const double x_rad = GCEM_PI * x_deg / 180.0; // we need the values to be in radians for the constexpr math
+        const double y_rad = GCEM_PI * y_deg / 180.0;
 
         const double A = gcem::sqrt(1 - gcem::pow(gcem::sin(x_rad), 2) * gcem::pow(gcem::sin(y_rad), 2));
         const double x0 = params.start_depth_m * gcem::sin(x_rad) * gcem::cos(y_rad) / A;
         const double y0 = params.start_depth_m * gcem::sin(y_rad) * gcem::cos(x_rad) / A;
         const double z0 = params.start_depth_m * gcem::cos(x_rad) * gcem::cos(y_rad) / A;
 
-        constexpr RxCoeffs coeffs = CompressTaylor(x0, y0, z0);
+        RxCoeffs coeffs = CompressTaylor(x0, y0, z0);
         (void)coeffs;
         DynRxData data{};
         return data;
@@ -310,13 +342,21 @@ public:
      * \brief 
      * 
      */
-    static consteval Delays PreCalcDelays() noexcept;
+    static consteval Delays PreCalcDelays() noexcept {
+
+        return Delays();
+
+    }
     
     /**
      * \brief 
      * 
      */
-    static consteval  void UncompressTaylorDyn(const DynRxData dynrx);
+    static consteval void UncompressTaylorDyn(const DynRxData dynrx) {
+
+        
+
+    }
 
     /**
      * \brief 
@@ -326,8 +366,8 @@ public:
      */
     static consteval RxDelays<usparams> CalculateDelays(const double x_deg, const double y_deg) noexcept {
 
-        const double x_rad = x_deg * PI / 180.0;
-        const double y_rad = y_deg * PI / 180.0;
+        const double x_rad = x_deg * GCEM_PI / 180.0;
+        const double y_rad = y_deg * GCEM_PI / 180.0;
 
         RxDelays<usparams> delays{};
 
@@ -352,30 +392,13 @@ public:
         return delays;
 
     }
-
-
-    /**
-     * \brief Get the Dyn Rx Data object
-     * 
-     * \return DynRxData& 
-     */
-    DynRxData& GetDynRxData() noexcept { return dyndata; }
-
-    /**
-     * \brief Get the Coeffs object
-     * 
-     * \return RxCoeffs& 
-     */
-    RxCoeffs& GetCoeffs() noexcept { return coeffs; }
-
-
-
+    
 private:
     
     DynRxData dyndata;  ///< A Queue Of Dynamic RX Data
     RxCoeffs coeffs;    ///< A Queue of Coefficients to Send to the FPGA/ASIC
     Delays delays;                ///< Delays to Send to the FPGA/ASIC
-    GroupPhases phases;                ///< Phases to Send to the FPGA/ASIC
+    GroupDelays groupphases;                ///< Phases to Send to the FPGA/ASIC
 
 };
 
@@ -418,8 +441,8 @@ public:
 
                 double x_deg = (params.x_max_deg - params.x_min_deg) * i / params.x_steps + params.x_min_deg;
                 double y_deg = (params.y_max_deg - params.y_min_deg) * j / params.y_steps + params.y_min_deg;
-                double x_rad = PI * x_deg / 180.0;
-                double y_rad = PI * y_deg / 180.0;
+                double x_rad = M_PI * x_deg / 180.0;
+                double y_rad = M_PI * y_deg / 180.0;
 
                 double A = gcem::sqrt(1 - gcem::pow(gcem::sin(x_rad), 2) * gcem::pow(gcem::sin(y_rad), 2));
                 double txx = params.focus_tx * gcem::sin(x_rad) * gcem::cos(y_rad) / A;

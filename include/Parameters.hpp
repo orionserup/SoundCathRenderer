@@ -21,7 +21,7 @@ namespace SoundCath {
 
     struct FPGAParams {
 
-        //const char* const Name{"Neso Artix 7"};
+        const char* const Name{nullptr};
         bool DisableLED{true};
 
     };
@@ -103,8 +103,8 @@ namespace SoundCath {
 
     struct TransducerParams {
 
-        double pitch_nm{1.8};       ///< The Element Pitch in the X and Y Direction
-        double group_pitch_nm{7.2}; ///< The Pitch of the Groups in the X and Y Direction
+        double pitch_nm{180000.0};       ///< The Element Pitch in the X and Y Direction
+        double group_pitch_nm{720000.0}; ///< The Pitch of the Groups in the X and Y Direction
         double soundspeed{1490.0};  ///< The Speed of Sound
         uint8_t numgroups{64};      ///< The Number of Groups
         uint8_t ygroups{16};        ///< The Number of Groups in the Y Direction
@@ -137,7 +137,6 @@ namespace SoundCath {
 
         struct TxParams {
 
-            double group_pitch_nm{7.2}; ///< The Pitch of the Groups in the X and Y Direction
             double xmax{7.5};
             double ymax{1.5};
             uint8_t L1{4};

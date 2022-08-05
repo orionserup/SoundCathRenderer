@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include "asic_call_wrapper_dll.h"
-
 #include <cstdint>
 #include <string>
 #include <array>

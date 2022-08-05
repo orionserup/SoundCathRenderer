@@ -12,6 +12,7 @@
 #include "Exception.hpp"
 
 #include <string>
+#include <sstream>
 
 #include <fmt/core.h>
 #include <fmt/ranges.h>
@@ -149,7 +150,7 @@ void ASIC<params>::ReadTXDelays(Delays& delays) {
     static std::string resp = driver.Query("ReadTxDelays");   
     static std::string delaystr = resp.substr(resp.find("[ASIC 0]:") + 1); // the delay string will be after the ASIC number
     std::istringstream output(driver.Recv()); // convert the output to a stream so that it can be converted to delays
-    output >> delays; // convert to delays
+    //output >> delays; // convert to delays
 
 }
 
@@ -159,7 +160,7 @@ void ASIC<params>::ReadRXDelays(Delays& delays) {
     std::string resp{ driver.Query("ReadRxDelays") };   
     std::string delaystr{ resp.substr(resp.find("[ASIC 0]:") + 1)}; // the delay string will be after the ASIC number
     std::istringstream output(driver.Recv()); // convert the output to a stream so that it can be converted to delays
-    output >> delays; // convert to delays and put it into the delay
+    //output >> delays; // convert to delays and put it into the delay
 
 }
 
@@ -212,12 +213,14 @@ void ASIC<params>::SetSerialNum(const std::string& serialnum) {
 template<ASICParams params>
 double ASIC<params>::GetBandGapV() const {
 
+    
     return 0.0f;
 
 }
 
 template<ASICParams params>
 bool ASIC<params>::RunTests() const {
+
 
     return false;
 

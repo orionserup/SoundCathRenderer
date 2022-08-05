@@ -14,7 +14,6 @@
 #include "Driver.hpp"
 
 #include <string>
-#include <vector>
 #include <iostream>
 #include <array>
 namespace SoundCath {
@@ -34,7 +33,7 @@ typedef GroupDelays GroupPhases;
 std::ostream& operator<<(std::ostream& os, const GroupDelays& rx);
 
 /// Delays for the Whole Transducer Array
-typedef std::array<int8_t, 16 * 64> Delays;
+typedef std::array<double, 16 * 64> Delays;
 /// Phases for Dynamic Curves
 typedef Delays Phases;
 

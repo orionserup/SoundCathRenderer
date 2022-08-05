@@ -31,9 +31,7 @@ int main(const int argc, const char* const* const kwargs) {
     constexpr SoundCath::TransducerParams tparams{};
     constexpr SoundCath::ControllerParams conparams{};
 
-    static constexpr auto data = SoundCath::Controller<conparams, tparams>::PreCalcScanData();
-
-    fmt::print("Data Size: {}", sizeof(data));
+    constexpr auto data = SoundCath::RXController<conparams.rxparams, tparams>::CompressTaylor(.005, .005, .005);
 
     return 0;
 
