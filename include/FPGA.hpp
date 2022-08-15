@@ -16,10 +16,14 @@
 
 namespace SoundCath {
 
+/**
+ * \brief Errors from the FPGA
+ * 
+ */
 struct FPGAError {
 
     /**
-    * \brief 
+    * \brief The Bitmask Flags 
     * 
     */
     enum Code: uint32_t {
@@ -43,23 +47,24 @@ struct FPGAError {
     /**
      * \brief Get the Error Message object
      * 
-     * \param error
-     * \return constexpr const char* 
+     * \param error: The error code
+     * \return constexpr const char*: What the error message is 
      */
     static const char* GetErrorMessage(const Code error) noexcept;
 
     /**
-     * \brief 
+     * \brief Throws various errors according to the error code
      * 
-     * \param code
+     * \param[in] code: The error code to interpret and throw corresponding errors
      */
     static void ThrowErrors(const Code code);
 
 };
 
 /**
- * \brief 
+ * \brief FPGA Class to Interface with the FPGA in the Box
  * 
+ * \tparam params: Parameters for the FPGA
  */
 template<FPGAParams params>
 class FPGA {
@@ -69,7 +74,7 @@ public:
     /**
      * \brief Construct a new FPGA object
      * 
-     * \param face 
+     * \param[in] face: The Oldeft Interface to Interact from
      */
     FPGA(Driver& face);
 
@@ -90,7 +95,7 @@ public:
     /**
      * \brief Get the Error object
      * 
-     * \return Error 
+     * \return Code: the Thrown error
      */
     FPGAError::Code GetError() const;
 

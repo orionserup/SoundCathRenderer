@@ -79,6 +79,13 @@ public:
     /**
      * \brief 
      * 
+     * \param size
+     */
+    void Benchmark(const uint32_t size);
+
+    /**
+     * \brief 
+     * 
      * \return auto& 
      */
     auto& GetRXController() noexcept { return rx; }
@@ -133,6 +140,13 @@ public:
      * \return false 
      */
     bool TestGenerateDelays();
+
+    /**
+     * \brief 
+     * 
+     * \param size
+     */
+    void Benchmark(const uint32_t size);
 
 private:
 

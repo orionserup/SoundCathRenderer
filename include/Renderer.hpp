@@ -20,6 +20,13 @@
 #include <vtkPolyDataMapper.h>
 
 namespace SoundCath {
+
+/**
+ * \brief Renders the Data to a File or GUI or Both
+ * 
+ * \todo Implement everything, sorry
+ * 
+ */
 class Renderer {
 
 public:
@@ -63,7 +70,6 @@ public:
      * \brief 
      * 
      * \param filename
-     * \return voiod 
      */
     void SaveToFile(const std::string filename);
 

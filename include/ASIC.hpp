@@ -112,6 +112,13 @@ struct ASICError {
 };
 
 
+/**
+ * \brief Controls and  Manages the ASIC
+ * 
+ * \todo Finish Implementation According to the Spec and test Everything
+ * 
+ * \tparam params: Physical parameters of the ASIC and the environment
+ */
 template<ASICParams params>
 class ASIC {
 

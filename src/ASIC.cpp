@@ -55,7 +55,7 @@ ASIC<params>::ASIC(Driver& driver): driver(driver) {
 }
 
 template<ASICParams params>
-ASIC<params>::InitializeASIC() {
+void ASIC<params>::InitializeASIC() const {
 
     static std::string command = fmt::format(FMT_COMPILE("InitializeASIC:{}"), params.speed);
     driver.Send(command);

@@ -17,11 +17,22 @@
 #include "Driver.hpp"
 namespace SoundCath {
     
+    /**
+     * \brief Contains all of the functionality for the Ultrasound
+     * 
+     * \todo Implement generic functionality for the Ultrasound to make it suitable for other hardware, a nice 
+     * 
+     * \tparam params: Physical and Other Parameters for the ASIC
+     */
     template<USParams params>
     class UltraSound {
 
     public:
 
+        /**
+         * \brief Construct a new Ultra Sound object
+         * 
+         */
         UltraSound();
 
 
@@ -34,6 +45,8 @@ namespace SoundCath {
 
         /**
          * \brief Set the Params Given in the Template Params 
+         * 
+         * \todo Finish for all parameters
          * 
          */
         void SetParams() const;

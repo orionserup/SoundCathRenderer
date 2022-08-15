@@ -1,7 +1,7 @@
 /**
- * \file main.hpp
+ * \file Parameters.hpp
  * \author Orion Serup (orionserup@gmail.com)
- * \brief 
+ * \brief Contains the Parameter Structures and the Default values For the Parameters
  * \version 0.1
  * \date 2022-04-02
  * 
@@ -19,15 +19,20 @@
 
 namespace SoundCath {
 
+    /// \todo Add a Compile Time JSON Parameter Parser so the Parameters can be worked with much more easily, Jason Turner's JSON Library should do the trick
+
+    /// Parameters for the FPGA, see the Docs for the complete list of params
     struct FPGAParams {
 
-        const char* const Name{nullptr};
-        bool DisableLED{true};
+        const char* const Name{nullptr}; ///< The name of the FPGA/Driver Device
+        bool DisableLED{true};  ///< Whether or not to have the LED on
 
     };
 
+    /// Parameters for the ASIC
     struct ASICParams {
 
+        /// Settings in the Core Group, directly from the PDF Documentation
         struct CoreSettings {
 
             uint8_t ISelLNA{4};             ///< Current Sensing LNA (0 - 15) Default 4
@@ -46,6 +51,7 @@ namespace SoundCath {
 
         };
 
+        /// The Internal Clock Speed of the ASIC
         enum ClkSpeed : uint8_t {
 
             LOW = 25,  ///< 25MHz
@@ -53,6 +59,7 @@ namespace SoundCath {
 
         };
 
+        /// Settings having to do with the Internal Beam Forming and Otherwise, see the documentation for the ASIC for more details
         struct BeamTiming {
 
             uint8_t SetupTime{25};       ///<           
@@ -65,6 +72,7 @@ namespace SoundCath {
 
         };
 
+
         struct DRVConfig {
 
             bool Enable{true};    ///< If DRV is Enabled
@@ -73,6 +81,7 @@ namespace SoundCath {
 
         };
 
+        /// Settings for the uBeamforming mode
         struct BModeSettings {
 
             std::array<bool, 64> offgroups{};   ///< The beam forming groups that are inactive
@@ -82,7 +91,7 @@ namespace SoundCath {
 
         };
 
-        CoreSettings core;
+        CoreSettings core;          ///< The Core Settings
         BModeSettings bmodesettings;///< uBeanforming Settings 
         ClkSpeed speed{LOW};        ///< ASIC Clock Speed
         DRVConfig drvconfig;        ///< DRV Configuration
@@ -166,7 +175,7 @@ namespace SoundCath {
         double focus_rx{0.0};       ///< Focus for Reception in Meters 0: Dynamic
         double focus_tx{0.05};      ///< Focus for Tx in Meters 0 : Plane
 
-        bool usedelays{true};       ///< If we are Using Delays or Coefficients
+        bool usedelays{false};       ///< If we are Using Delays or Coefficients
 
     };
 
@@ -221,51 +230,4 @@ namespace SoundCath {
     };
 
 
-    /**
-     * \brief 
-     * 
-     */
-    class ParameterParser{
-    public:
-
-        /**
-         * \brief Construct a new Renderer Parameters object
-         * 
-         * \param argc
-         * \param kwargs
-         */
-        ParameterParser(const int argc, const char* const* const kwargs);
-
-        /**
-         * \brief Construct a new Renderer Parameters object
-         * 
-         */
-        ParameterParser() = default;
-
-        /**
-         * \brief 
-         * 
-         * \param argc
-         * \param kwargs
-         */
-        void ParseCL(const int argc, const char* const* const kwargs);
-
-        /**
-         * \brief Get the Params object
-         * 
-         * \return Params& 
-         */
-        RenderParams& GetParams() { return this->params; }
-
-    private:
-
-        RenderParams params; ///< The parsed Parameters
-    
-        /**
-         * \brief 
-         * 
-         */
-        void PrintMenu();    
-
-    };
 }

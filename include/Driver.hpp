@@ -19,7 +19,7 @@
 #include "Parameters.hpp"
 
 #ifdef _WIN32
-#include<windows.h>
+#include <windows.h>
 
 /**
  * \brief  Type definition for the dll imported function for the asic call wrapper
@@ -34,7 +34,7 @@ typedef int (_stdcall *f_dllfunction)(char *inString, char *outString);
 namespace SoundCath {
 
 /**
- * \brief 
+ * \brief Errors caused from the Driver/Interface
  * 
  */
 struct DriverError {
@@ -152,34 +152,6 @@ private:
     #endif                              
 
     std::array<char, UINT16_MAX> outbuffer;    ///< Data Buffer For the output data, 65kB wide     
-
-    /**
-     * \brief Get the Version Command object
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* GetVersionCommand() noexcept;
-
-    /**
-     * \brief
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* InitializeCommand() noexcept;
-
-    /**
-     * \brief Set the Serial Command object
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* SetSerialCommand() noexcept;
-
-    /**
-     * \brief 
-     * 
-     * \return constexpr const char* 
-     */
-    static constexpr const char* CloseCommand() noexcept;
 
 };
 

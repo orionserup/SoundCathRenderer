@@ -14,12 +14,15 @@
 #include <array>
 #include <vector>
 #include <string>
+/// std:pair mostly
 #include <utility>
+/// min_element and max_element and other func stuff
 #include <algorithm>
 
 #include "ASIC.hpp"
 #include "FPGA.hpp"
 
+/// Compile Time Math Library, I have Contributed to its development and made it Windows Compatible (Generalized Compile Expression Math) same api as std::math
 #include <gcem.hpp>
 
 using std::array;
@@ -27,15 +30,18 @@ using std::vector;
 
 namespace SoundCath {
 
+/// Represents all of the Compressed Beam Data for Transmission
 struct TxTaylor {
 
-    TxCoeffs coeffs;
-    double beamoffset_s;
+    TxCoeffs coeffs;        ///< The Actual Taylor Coefficients
+    double beamoffset_s;    ///< The Offset of the beam for the reading
 
 };
 
 /**
- * \brief Controller for the Transission, generates the Appropiate Delays and Coefficients
+ * \brief Controller for the Transmission, generates the Appropiate Delays and Coefficients
+ * 
+ * \todo Implement more functionality and Implement Taylor and Delay Storage or eliminate it
  * 
  */
 template<ControllerParams::TxParams params, TransducerParams usparams>
@@ -44,20 +50,27 @@ class TXController {
 public:
 
     /**
-     * \brief 
+     * \brief Precalculates Delays
      * 
-     * \return constexpr TXDelays 
+     * \note Based on the MATLAB Scripts in BMode3D
+     * \todo Implement this
+     * 
+     * \return Delays: Precalculated delays, done at compile time
      */
     consteval Delays PreCalcDelays() noexcept;
 
     /**
-     * \brief 
+     * \brief Generates a Taylor Polynomial for the Transmission towards a certain point In 3-D Space
      * 
-     * \param x
-     * \param y
-     * \param z
-     * \param beamoffset_s
-     * \return consteval 
+     * \note See the Matlab script for clarification, I don't know how or why this works, Oldeft has dog shit documentation skills on both their API and their matlab testing code
+     * \todo Test and verify this alongside the MATLAB Code
+     * 
+     * \param[in] x: The X Coordinate In Space
+     * \param[in] y: The Y Coordinate In Space
+     * \param[in] z: The Z Coordinate In Space
+     * \param[in] beamoffset_s: How long to wait to receive the beam
+     * 
+     * \returns TxTaylor: The Taylor Polynomial \ref TxTaylor 
      */
     static consteval TxTaylor CompressTaylor(const double x, const double y, const double z, const double beamoffset_s) noexcept {
 
@@ -99,33 +112,36 @@ public:
     }
 
     /**
-     * \brief 
+     * \brief Calculates the Transmission Delays to Target A Specific point
      * 
-     * \tparam x 
-     * \tparam y 
-     * \tparam z 
-     * \return Delays 
+     * \note This is straight from Oldelft, Again I dont know how or why it works or even if it works
+     * \todo Test and verify this side to side with the MATLAB script
+     * 
+     * \param[in] x: X in 3-D Space
+     * \param[in] y: Y in 3-D Space
+     * \param[in] z: Z in 3-D Space
+     * \return Delays: The Delays that Would hit that point, evaluated   
      */
     static consteval Delays CalculateDelays(const double x, const double y, const double z) noexcept {
 
-        const double r = gcem::sqrt(gcem::pow(x, 2) + gcem::pow(y, 2) + gcem::pow(z, 2));
+        const long double r = gcem::sqrt(gcem::pow(x, 2) + gcem::pow(y, 2) + gcem::pow(z, 2));
         Delays delays{};
 
         for(int yg = 0; yg < usparams.ygroups; yg++) {
 
-            double ygroup = (yg - usparams.ygroups/2 - .5) * usparams.group_pitch_nm * gcem::pow(10.0, -9.0);
+            const long double ygroup = (yg - usparams.ygroups/2 - .5) * usparams.group_pitch_nm * gcem::pow(10.0, -9.0);
 
             for(int xg = 0; xg < usparams.xgroups; xg++) {
 
-                double xgroup = (xg - usparams.xgroups/2 - .5) * usparams.group_pitch_nm * gcem::pow(10.0, -9.0);
-                int igroup = yg * usparams.xgroups + xg;
+                const double xgroup = (xg - usparams.xgroups/2 - .5) * usparams.group_pitch_nm * gcem::pow(10.0, -9.0);
+                const long int igroup = yg * usparams.xgroups + xg;
 
                 for(int elx = 0; elx < usparams.xelems; elx++) {
 
-                    double xel = xgroup + (elx - usparams.xelems/2 -.5) * usparams.pitch_nm * gcem::pow(10.0, -9);
+                    const long double xel = xgroup + (elx - usparams.xelems/2 -.5) * usparams.pitch_nm * gcem::pow(10.0, -9);
                     for(int ely = 0; ely < usparams.yelems; ely++) {
-                        int el = (elx * usparams.yelems) + ely;
-                        double yel = ygroup + (ely - usparams.yelems/2 - .5) * usparams.pitch_nm * gcem::pow(10.0, -9.0);
+                        const long int el = (elx * usparams.yelems) + ely;
+                        const long double yel = ygroup + (ely - usparams.yelems/2 - .5) * usparams.pitch_nm * gcem::pow(10.0, -9.0);
                         delays[el + igroup * usparams.elempergroup] = -(gcem::sqrt(gcem::pow(x - xel, 2) + gcem::pow(y - yel, 2) + gcem::pow(z, 2)) - r) / (usparams.soundspeed * params.delay_res_ns * gcem::pow(10.0, -9));
 
                     }
@@ -136,28 +152,29 @@ public:
         int8_t offset = -*std::min_element(std::begin(delays), std::end(delays));
 
         for(int i = 0; i < usparams.numelements; i++)
-            delays[i] += offset/(params.delay_res_ns * gcem::pow(10.0, -9.0));
+            delays[i] += offset/ (params.delay_res_ns * gcem::pow(10.0, -9.0));
 
         return delays;
 
 }
     
     /**
-     * \brief 
+     * \brief Calculates the Delays for a Given Reception Taylor Polynomial
      * 
+     * \note Implement this according to Oldeft MATLAB Code
+     * \todo Write this
+     * 
+     * \param[in] coeffs: The Coefficients to Decompress
+     * \return Delays: The Caclulated Delays According to the Taylor Polynomial 
      */
     static consteval Delays UncompressTaylor(const TxCoeffs coeffs) noexcept {
-
-        Delays delays{};
-
-
 
         return Delays();
 
     }
 
     /**
-     * \brief Get the Coeffs object
+     * \brief Get the Held Taylor 
      * 
      * \return TxCoeffs& 
      */
@@ -182,99 +199,90 @@ private:
 
 };
 
+/// Everything used for Dynamic RX, AKA Going from One Point to Another On a Ray from the Origin
 struct DynRxData {
 
-    std::array<double, 8> slope;
-    std::array<double, 8> duration;
-    std::array<double, 9> mastercurve;
-    RxCoeffs coeffs;
+    std::array<double, 8> slope;        ///< The Slope of the Coefficients
+    std::array<double, 8> duration;     ///< How Long to Hold 
+    std::array<double, 9> mastercurve;  ///< The Base curve to Calculate
+    RxCoeffs coeffs;                    ///< The Coefficients to Start with
 
 };
 
+/// Delays for the Reception, Delays for every element and delays for every group, may not want to have it be a templated struct
 template<TransducerParams usparams>
 struct RxDelays {
 
-    Delays delays; ///< The Actual Delays Per Element in Rx Delay Res Units
+    Delays delays;           ///< The Actual Delays Per Element in Rx Delay Res Units
     GroupDelays groupdelays; ///< Group Delay Per Group in S
 
 };
 
+/// Recovered delays will yield a delay for every element and a phase 
 template<TransducerParams usparams>
 struct DecompRxDelays {
 
-    Delays delays;
-    Phases phases;
+    Delays delays;  ///< Delay for every element
+    Phases phases;  ///< Phase for every element, radian
 
 };
 
 
 /**
- * \brief 
+ * \brief Controls and Calculates the Delays and Taylor Coefficients Of Reception
  * 
- * \tparam params 
  */
 template<ControllerParams::RxParams params, TransducerParams usparams>
 class RXController {
-
 public:
 
     /**
-     * \brief Get the Assignment Min Max object
+     * \brief Calculates the Appropriate Taylor Polynomial to Receive at a given point
      * 
-     * \param coeffs
-     * \param scale
-     * \return consteval 
-     */
-    static consteval std::pair<double, double> GetAssignmentMinMax(const double coeffs[7], const uint8_t scale) {
-
-        (void)coeffs;
-        (void)scale;
-        return std::pair<double, double>(0.0, 0.0);
-
-    }
-
-public:
-
-    /**
-     * \brief 
+     * \note Straight from Oldelft, they are dumb and I don't know how it works
+     * \todo Test and Verify and Compare against MATLAB 
      * 
-     * \param focus
-     * \return RxCoeffs: The RX Taylor Coefficients 
+     * \param[in] x: X in 3-D Space 
+     * \param[in] y: Y in 3-D Space
+     * \param[in] z: Z in 3-D Space
+     * 
+     * \return RxCoeffs: The Taylor Coefficients for reception, calculated at compile time
      */
     static consteval RxCoeffs CompressTaylor(const double x, const double y, const double z) noexcept {
 
-        if(!(x > 0 && y > 0 && z > 0))
-            return RxCoeffs();
+        if (x == 0 && y == 0 && z == 0)
+            return RxCoeffs{};
 
-        double r = gcem::sqrt(gcem::pow(x, 2.0) + gcem::pow(y, 2.0) + gcem::pow(z, 2.0));
-        double x_r = x / r;
-        double y_r = y / r;  
+        const double r = gcem::sqrt(gcem::pow(x, 2.0) + gcem::pow(y, 2.0) + gcem::pow(z, 2.0));
+        const double x_r = x / r;
+        const double y_r = y / r;  
 
         const double pitch = usparams.pitch_nm * gcem::pow(10.0, -9);
         const double gpitch = pitch * usparams.xelems;
         const double res = params.delay_res_ns * gcem::pow(10.0, -9);
-        const double csound = usparams.soundspeed;
+        
+        const auto csound = usparams.soundspeed;
 
         // Find Each Term: Ripped Straight From the ASIC Spec Doc
-        double seventh = x_r / csound * pitch * params.c78factor / res; 
-        double eighth = y_r / csound * pitch * params.c78factor / res;
+        const double seventh = x_r / csound * pitch * params.c78factor / res; 
+        const double eighth = y_r / csound * pitch * params.c78factor / res;
 
-        double zeroth = (x_r / csound * pitch / res - gcem::floor(seventh + .5) / params.c78factor) * params.L0; 
-        double first = 1.0 / r * (gcem::pow(x_r, 2) - 1) / csound * pitch * gpitch * params.L1 / res; // scaling to prevent loss of accuracy and keeping units
-        double second = 3.0 / gcem::pow(r, 2.0) * (gcem::pow(x_r, 3.0) - x_r) /2  / csound * pitch * gcem::pow(gpitch, 2) * params.L2 / res; // scaling for accuracy keeping
-        double sixth  = 1.0 / r * x_r * y_r / csound * pitch * gpitch * params.L1 / res;
-        double third = (y_r / csound * pitch / res - gcem::floor(eighth + .5)/ params.c78factor) * params.L0;
-        double fourth = 1.0 / r * (gcem::pow(y_r, 2) - 1) / csound * pitch * gpitch * params.L1 / res;
-        double fifth = 3.0 / gcem::pow(r, 2) * (gcem::pow(y_r, 3) - y_r)/2 /csound * pitch * gcem::pow(gpitch, 2) * params.L2 / res;
+        const double zeroth = (x_r / csound * pitch / res - gcem::floor(seventh + .5) / params.c78factor) * params.L0; 
+        const double first = 1.0 / r * (gcem::pow(x_r, 2) - 1) / csound * pitch * gpitch * params.L1 / res; // scaling to prevent loss of accuracy and keeping units
+        const double second = 3.0 / gcem::pow(r, 2.0) * (gcem::pow(x_r, 3.0) - x_r) /2  / csound * pitch * gcem::pow(gpitch, 2) * params.L2 / res; // scaling for accuracy keeping
+        const double sixth  = 1.0 / r * x_r * y_r / csound * pitch * gpitch * params.L1 / res;
+        const double third = (y_r / csound * pitch / res - gcem::floor(eighth + .5)/ params.c78factor) * params.L0;
+        const double fourth = 1.0 / r * (gcem::pow(y_r, 2) - 1) / csound * pitch * gpitch * params.L1 / res;
+        const double fifth = 3.0 / gcem::pow(r, 2) * (gcem::pow(y_r, 3) - y_r)/2 /csound * pitch * gcem::pow(gpitch, 2) * params.L2 / res;
 
-        double terms[] = { zeroth, first, second, third, fourth, fifth, sixth, seventh, eighth };
+        const double terms[] = { zeroth, first, second, third, fourth, fifth, sixth, seventh, eighth };
 
         int i = 1;
         for(; i <= 16; i *= 2) { // Just see the docs, its only this messy to have it evaluate at compile time
         
-            if(i == 2) continue;
+            if (i == 2) continue;
 
-            if( *std::min_element(std::begin(terms), std::end(terms)) / i < -128.0 || 
+            if ( *std::min_element(std::begin(terms), std::end(terms)) / i < -128.0 || 
                 *std::max_element(std::begin(terms), std::end(terms)) / i > 127.0) 
                 continue;
             
@@ -305,19 +313,27 @@ public:
     }
 
     /**
-     * \brief 
+     * \brief Decompresses the Taylor Coefficients into Delays and Phases
      * 
-     * \param coeffs
-     * \return consteval 
+     * \note See the MATLAB script for details
+     * \todo Implement this, test it, and verify it
+     * 
+     * \param[in] coeffs: Taylor Polynomial
+     * 
+     * \return RxDelays: The uncompressed coefficients
      */
     static consteval RxDelays<usparams> UncompressTaylor(const RxCoeffs coeffs) noexcept;
 
     /**
-     * \brief 
+     * \brief Calculates the Necessary Data to Receive From a Range On a ray in a direction
      * 
-     * \tparam x_deg 
-     * \tparam y_deg 
-     * \return constexpr DynRxData 
+     * \note Straight from Oldelft scripts, Don't know how it works
+     * \todo Finish this Implementation and test/verify it against the MATLAB version
+     * 
+     * \param[in] x_deg: Angle From the Norm in the XZ plane
+     * \param[in] y_deg: Angle From the Norm in the YZ Plane
+     * \param[in] runtime: How many units of delay resolution to scan over
+     * \return DynRxData: The Actual Delays/Coefficients and The Slope Over them
      */
     static consteval DynRxData CompressTaylorDyn(const double x_deg, const double y_deg, const uint8_t runtime) noexcept {
 
@@ -339,7 +355,10 @@ public:
     }
 
     /**
-     * \brief 
+     * \brief Precalculates the Delays for Receiving 
+     * 
+     * \note See the MATLAB Script for implementation details
+     * \todo Implement everything
      * 
      */
     static consteval Delays PreCalcDelays() noexcept {
@@ -349,7 +368,10 @@ public:
     }
     
     /**
-     * \brief 
+     * \brief Takes Dynamic Compression Data and Gets Delays From it
+     * 
+     * \note Implemented based on the Oldeft MATLAB Scripts
+     * \todo Actually Implement this
      * 
      */
     static consteval void UncompressTaylorDyn(const DynRxData dynrx) {
@@ -359,10 +381,14 @@ public:
     }
 
     /**
-     * \brief 
+     * \brief Generates compressed Taylor Polynomials for reading from a given direction
      * 
-     * \param focus
-     * \param delays
+     * \note Straight from Oldelft MATLAB scripts, don't know or follow the logic
+     * \todo Test and verify the Algorithm as well as finish it according to the script
+     * 
+     * \param[in] x_deg: The Angle from the XZ plane
+     * \param[in] y_deg: The angle from the XY plane
+     * \return RxDelays: The Appropiate Taylor Polynomial data for receiving from the x and y degrees ray direction 
      */
     static consteval RxDelays<usparams> CalculateDelays(const double x_deg, const double y_deg) noexcept {
 
@@ -395,32 +421,61 @@ public:
     
 private:
     
-    DynRxData dyndata;  ///< A Queue Of Dynamic RX Data
-    RxCoeffs coeffs;    ///< A Queue of Coefficients to Send to the FPGA/ASIC
-    Delays delays;                ///< Delays to Send to the FPGA/ASIC
-    GroupDelays groupphases;                ///< Phases to Send to the FPGA/ASIC
+    DynRxData dyndata;      ///< Dynamic RX Data if its being used
+    RxCoeffs coeffs;        ///< Coefficients to Send to the FPGA/ASIC
+    Delays delays;          ///< Delays to Send to the FPGA/ASIC
+    GroupDelays groupphases;///< Phases to Send to the FPGA/ASIC
 
-};
 
-template<ControllerParams params, TransducerParams usparams>
-struct ScanData {
+    /**
+     * \brief Get the Assignment Min Max, it is a helper for some of the functions, see the MATLAB Code
+     * 
+     * \note Don't really know how or why it is supposed to work 
+     * \todo Implement and Test it
+     * 
+     * \param[in] coeffs: Coefficients to sort and minmax
+     * \param[in] scale: the value to divide the coeffs by
+     * 
+     * \return std::pair, the min and max
+     */
+    static consteval std::pair<double, double> GetAssignmentMinMax(const double coeffs[7], const uint8_t scale) {
 
-    Delays txdelays[params.x_steps * params.y_steps];
-    RxDelays<usparams> rxdelays[params.x_steps * params.y_steps];
-    TxCoeffs txcoeffs[params.x_steps * params.y_steps];
-    RxCoeffs rxcoeffs[params.x_steps * params.y_steps];
+        (void)coeffs;
+        (void)scale;
+        return std::pair<double, double>(0.0, 0.0);
 
-    double txoffset[params.x_steps * params.y_steps];
-    GroupDelays rxgroupdelays[params.x_steps * params.y_steps];
+    }
 
-    DynRxData dynrx[params.x_steps * params.y_steps];
-    Phases rxphases[params.x_steps * params.y_steps];
 
 };
 
 /**
- * \brief 
+ * \brief All of the Data that is Needed to Sweep over a given 3-D Volume defined By the template Parameters
  * 
+ * \tparam params: Controller Related Parameters including x and y steps 
+ * \tparam usparams: Physical Parameters for the Ultrasound 
+ */
+template<ControllerParams params, TransducerParams usparams>
+struct ScanData {
+
+    std::array<Delays, params.x_steps * params.y_steps> txdelays;               ///< Tx Delays Over that Scan Area
+    std::array<RxDelays<usparams>, params.x_steps * params.y_steps> rxdelays;   ///< Rx Delays Over the Scan Area
+    std::array<TxCoeffs, params.x_steps * params.y_steps> txcoeffs;             ///< Tx Taylor Coefficients Over the Scan Area
+    std::array<RxCoeffs, params.x_steps * params.y_steps> rxcoeffs;             ///< Rx Taylor Coefficients Over the Scan Area
+
+    std::array<double, params.x_steps * params.y_steps> txoffsets;              ///< Transmissions Offsets Over the Scan Area
+    std::array<GroupDelays, params.x_steps * params.y_steps> rxgroupdelays;     ///< Group Delays over the scan area for reception
+
+    std::array<DynRxData, params.x_steps * params.y_steps> dynrx;               ///< Dynamic RX Curves for the whole scan area
+    std::array<Phases, params.x_steps * params.y_steps> phases;                 ///< Phases over the Scan Volume
+
+};
+
+/**
+ * \brief Controller that Manages both RX and TX
+ * 
+ * \tparam params: Controller Parameters, how and where and when we want to scan
+ * \tparam usparams: The Physical Parameters
  */
 template<ControllerParams params, TransducerParams usparams>
 class Controller {
@@ -428,9 +483,12 @@ class Controller {
 public:
 
     /**
-     * \brief 
+     * \brief Calculates the Scan Data for the whole scan range, all of the Coefficents, Delays, or Dynamic Data depending on the Controller Paramaters
      * 
-     * \return consteval 
+     * \note Just Calculates Coeffs or Delays or Dynamic Data based on Controller Parameters
+     * \todo Test and Verify this
+     * 
+     * \return ScanData: Enough Data to go over the whole scan volume
      */
     static consteval ScanData<params, usparams> PreCalcScanData() noexcept {
 
@@ -441,8 +499,8 @@ public:
 
                 double x_deg = (params.x_max_deg - params.x_min_deg) * i / params.x_steps + params.x_min_deg;
                 double y_deg = (params.y_max_deg - params.y_min_deg) * j / params.y_steps + params.y_min_deg;
-                double x_rad = M_PI * x_deg / 180.0;
-                double y_rad = M_PI * y_deg / 180.0;
+                double x_rad = GCEM_PI * x_deg / 180.0;
+                double y_rad = GCEM_PI * y_deg / 180.0;
 
                 double A = gcem::sqrt(1 - gcem::pow(gcem::sin(x_rad), 2) * gcem::pow(gcem::sin(y_rad), 2));
                 double txx = params.focus_tx * gcem::sin(x_rad) * gcem::cos(y_rad) / A;
@@ -455,10 +513,11 @@ public:
                 double rxy = rxr * gcem::sin(y_rad) * gcem::cos(x_rad) / A;
                 double rxz = rxr * gcem::cos(x_rad) * gcem::cos(y_rad) / A;
                 
-                if (params.usedelays) {
+                if constexpr (!params.usedelays) {
 
                     data.txcoeffs[i + j * params.x_steps] = TXController<params.txparams, usparams>::CompressTaylor(txx, txy, txz, 0).coeffs;
-                    data.txoffset[i + j * params.x_steps] = TXController<params.txparams, usparams>::CompressTaylor(txx, txy, txz, 0).beamoffset_s;
+                    data.rxcoeffs[i + j * params.x_steps] = RXController<params.rxparams, usparams>::CompressTaylor(txx, txy, txz);
+                    data.txoffsets[i + j * params.x_steps] = TXController<params.txparams, usparams>::CompressTaylor(txx, txy, txz, 0).beamoffset_s;
                     data.rxgroupdelays[i + j * params.x_steps] = RXController<params.rxparams, usparams>::CalculateDelays(x_deg, y_deg).groupdelays;
 
                 }
@@ -478,23 +537,32 @@ public:
     /**
      * \brief 
      * 
+     * \todo Implement this
+     * 
      */
     void ProcessGroupsArray();
 
     /**
      * \brief 
      * 
+     * \todo Implement this
+     * 
      */
     void InitArraysGeneral();
 
     /**
+     * 
      * \brief 
+     * 
+     * \todo Implement this
      * 
      */
     void InitArraysWet();
 
     /**
      * \brief Get the Time Dry object
+     * 
+     * \todo Implement this
      * 
      * \return double 
      */
@@ -513,7 +581,7 @@ private:
     TXController<params.txparams, usparams> tx;    ///< Transmssion Controller
     RXController<params.rxparams, usparams> rx;    ///< Receiving Controller
     
-    ScanData<params, usparams> scandata;                          ///< All of the Delays and Stuff for the whole run
+    ScanData<params, usparams> scandata;           ///< All of the Delays and Stuff for the whole run
 
 };
 

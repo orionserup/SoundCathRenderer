@@ -22,6 +22,12 @@
 
 namespace SoundCath {
 
+/**
+ * \brief GUI Implementation using VTK
+ * 
+ * \todo Everything
+ * 
+ */
 class GUI {
 
 public:

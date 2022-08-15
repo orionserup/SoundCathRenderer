@@ -42,42 +42,14 @@ if(NOT plog_FOUND)
     add_subdirectory(${CMAKE_BINARY_DIR}/../3rdparty/plog ../3rdparty/plog/build)
 endif()
 
-#---------------------- Compile Options ----------------- #
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
-
-if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-
-    set(CMAKE_CXX_FLAGS "/W4 /Wall /constexpr /constexpr:steps1000000000 /Zm2000")
-    set(CMAKE_CXX_FLAGS_DEBUG "/DDEBUG /Od /D_DEBUG /DEBUG")
-    set(CMAKE_CXX_FLAGS_RELEASE "/DNDEBUG /D_NDEBUG /Ot /GL")
-
-else()
-
-    set(CMAKE_CXX_FLAGS_DEBUG "-DDEBUG -Og -pedantic")
-    set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -O3 -march=native -mtune=native -flto")
-    set(LINK_FLAGS_RELEASE "-flto")
-
-endif()
-
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    
-    set(CMAKE_CXX_FLAGS "-Wall -Wextra -fconstexpr-steps=1000000000")
-
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-
-    set(CMAKE_CXX_FLAGS "-Wall -Wextra -fconstexpr-ops-limit=1000000000")
-
-endif()
+#------------------- Compile Targets --------------------- #
 
 file(GLOB SOURCES "../src/*[!main].cpp")
 file(GLOB INCLUDES "../include/*.h*")
 
 file(GLOB TESTFILES "../test/*/*.hpp" "../test/*/*.cpp")
 set(DOCSOURCES "../src" "../include" "../test/" "../README.md")
-
-#------------------- Compile Targets --------------------- #
 
 add_library(UltraSound STATIC ${SOURCES})
 target_include_directories(UltraSound PRIVATE ../include)
@@ -108,6 +80,41 @@ install(TARGETS UltraSound
         DESTINATION ${CMAKE_INSTALL_LIBRARY_PATH})
 
 install(FILES ${INCLUDES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/SoundCath)
+
+#---------------------- Compile Options ----------------- #
+
+target_compile_features(UltraSound PUBLIC cxx_std_20) # use c++20 and above
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+
+    target_compile_options(UltraSound PUBLIC $<$<CONFIG:RELEASE>:/W4 /Wall /constexpr /constexpr:steps1000000000 /Zm2000>)
+    target_compile_options(UltraSound PUBLIC $<$<CONFIG:DEBUG>:/Od /Zi /MDd>)
+    target_compile_options(UltraSound PUBLIC $<$<CONFIG:RELEASE>:/Ot /GL>)
+    target_compile_definitions(UltraSound PUBLIC $<$<CONFIG:DEBUG>: _DEBUG DEBUG>)
+    target_compile_definitions(UltraSound PUBLIC $<$<CONFIG:RELEASE>:NDEBUG _NDEBUG>)
+    target_link_options(UltraSound PUBLIC $<$<CONFIG:DEBUG>:DEBUG>)
+    
+else()
+
+    target_compile_options(UltraSound PUBLIC $<$<CONFIG:DEBUG>:-Og -pedantic>)
+    target_compile_definitions(UltraSound PUBLIC $<$<CONFIG:DEBUG>:DEBUG>)
+    target_compile_options(UltraSound PUBLIC $<$<CONFIG:RELEASE>:-Ofast -march=native -mtune=native -flto>)
+    target_compile_definitions(UltraSound PUBLIC $<$<CONFIG:RELEASE>:NDEBUG>)
+    target_link_options(UltraSound PUBLIC $<$<CONFIG:RELEASE>: -flto>)
+
+endif()
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    
+    target_compile_options(UltraSound PUBLIC -Wall -Wextra -fconstexpr-steps=1000000000)
+
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+
+    target_compile_options(UltraSound PUBLIC -Wall -Wextra -fconstexpr-ops-limit=1000000000)
+
+endif()
+
+
 
 # ------------- Documentation Generation ------------------ #
 

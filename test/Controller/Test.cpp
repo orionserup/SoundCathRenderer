@@ -11,6 +11,18 @@
 
 #include "Test.hpp"
 
-using SoundCath::ControllerTester;
+#include <chrono>
 
-ControllerTester::
+using SoundCath::ControllerTester;
+using SoundCath::RXControllerTester;
+
+template<ControllerParams::RxParams params, TransducerParams tparams>
+void RXControllerTester<params, tparams>::Benchmark(const uint32_t size) {
+
+    static auto start = std::chrono::high_precision_clock
+
+
+
+
+};
+
