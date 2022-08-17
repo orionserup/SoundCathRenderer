@@ -1,7 +1,7 @@
 /**
  * \file FPGA.hpp
  * \author Orion Serup (orionserup@gmail.com)
- * \brief 
+ * \brief Contains all of class definitions and declarations for the FPGA Class
  * \version 0.1
  * \date 01-28-2022
  * 
@@ -81,14 +81,14 @@ public:
     /**
      * \brief Get the Version object
      * 
-     * \return string 
+     * \return string: The version 
      */
     std::string GetVersion() const { return this->version; }
 
     /**
      * \brief Get the Description object
      * 
-     * \return string 
+     * \return string: The Device description
      */
     std::string GetDescription() const { return this->desc; }
 

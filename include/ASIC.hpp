@@ -28,6 +28,7 @@ typedef GroupDelays GroupPhases;
  * \throws ios_base::failure: If the Data Can't be Formatted
  * \param[out] os: The Output Stream To Send the Formatted Data To 
  * \param[in] rx: The Delays to Parse and Send
+ * \todo Implement this
  * \return std::ostream&:  A Modified output stream 
  */
 std::ostream& operator<<(std::ostream& os, const GroupDelays& rx);
@@ -40,6 +41,7 @@ typedef Delays Phases;
 /**
  * \brief Prints A Delay to a Stream
  * \throws ios_base::failure: If there is an Issue Reading the Value
+ * \todo Implement this
  * \param[out] os: Output Stream, Could be a string stream, cout, etc..
  * \param[in] rx: Delay to write to the stream
  * \return std::ostream&: A Modified Stream Reference for chaining
@@ -49,6 +51,7 @@ std::ostream& operator<<(std::ostream& os, const Delays& delays);
 /**
  * \brief Gets a Delay String and Turns It into an Actual Delay Object
  * \throws ios_base::failure: If it can't resolve the Delay String
+ * \todo Implement this
  * \param[in] is: Input Stream to Get the String from 
  * \param[out] delays: Actual Delay Object to Write to
  * \return std::istream&: A modified input strema reference

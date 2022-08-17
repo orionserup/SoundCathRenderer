@@ -17,6 +17,8 @@
 #include <string>
 #include <string_view>
 
+/// \todo finish adding all parameters and documentation accordingly
+
 namespace SoundCath {
 
     /// \todo Add a Compile Time JSON Parameter Parser so the Parameters can be worked with much more easily, Jason Turner's JSON Library should do the trick

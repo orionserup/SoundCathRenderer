@@ -1,7 +1,7 @@
 /**
  * \file Ultrasound.hpp
  * \author Orion Serup (orionserup@gmail.com)
- * \brief 
+ * \brief Contains the definitions and declarations for the Ultrasound module
  * \version 0.1
  * \date 2022-04-02
  * 
@@ -15,6 +15,7 @@
 #include "ASIC.hpp"
 #include "FPGA.hpp"
 #include "Driver.hpp"
+
 namespace SoundCath {
     
     /**

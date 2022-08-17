@@ -20,12 +20,16 @@
 
 using SoundCath::RXController;
 
+/// \todo Write the main to use the ultrsound and render it to a gui
+/// \todo Make sure that the compiler can handle all of the constexpr, needs more than 12GB Ram Currently
+/// \todo Implement a command line argument parser and setup options, there are a few libraries that will help
+
 /**
- * \brief 
+ * \brief The Program entry point
  * 
- * \param argc
- * \param kwargs
- * \return int 
+ * \param argc: The Number of Arguments
+ * \param kwargs: The Arguments
+ * \return int: The exit status code
  */
 int main(const int argc, const char* const* const kwargs) {
 

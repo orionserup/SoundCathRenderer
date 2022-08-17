@@ -1,7 +1,7 @@
 /**
- * \file Interface.hpp
+ * \file Driver.hpp
  * \author Orion Serup (orionserup@gmail.com)
- * \brief 
+ * \brief Contains the definitions, protoypes and other declarations associated with the Physical Interface
  * \version 0.1
  * \date 01-28-2022
  * 
@@ -18,14 +18,12 @@
 
 #include "Parameters.hpp"
 
-#ifdef _WIN32
+#ifdef _WIN32 || defined(_WIN64)
 #include <windows.h>
 
 /**
  * \brief  Type definition for the dll imported function for the asic call wrapper
  * \note   From Oldelft
- * \param  f_dllfunction:
- * \retval int: error code
  */
 typedef int (_stdcall *f_dllfunction)(char *inString, char *outString);
 
@@ -64,7 +62,7 @@ struct DriverError {
     /**
      * \brief Get the Error Message From the Error Code
      * 
-     * \param[in] error
+     * \param[in] error: Integral error code, bitwise or'd combination of errors
      * \return const char*: The Error Message as a String
      */
     static const char* GetErrorMessage(const Code error) noexcept;

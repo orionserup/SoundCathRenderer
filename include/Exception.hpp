@@ -1,7 +1,7 @@
 /**
  * \file Exception.hpp
  * \author Orion Serup (orionserup@gmail.com)
- * \brief 
+ * \brief Contains the class definitions, protoypes and other declarations for the Exceptions related to the application
  * \version 0.1
  * \date 2022-01-29
  * 
@@ -90,16 +90,16 @@ public:
     /**
      * \brief Construct a new Controller Exception object
      * 
-     * \param message
+     * \param[in] message: Error message to attach to the error
      */
     ControllerException(const char* message);
 
     virtual ~ControllerException() {}
 
     /**
-     * \brief 
+     * \brief Gets the error message asscoiated with the error
      * 
-     * \return const char* 
+     * \return const char*: error message c string
      */
     const char* what() const noexcept override;
 
@@ -116,22 +116,22 @@ public:
     /**
      * \brief Construct a new FPGAException object
      * 
-     * \param[in] error
+     * \param[in] error: Error code associated with the error
      */
     FPGAException(const FPGAError::Code error);
 
     virtual ~FPGAException() {}
 
     /**
-     * \brief 
+     * \brief Gets the associated error message
      * 
-     * \return const char* 
+     * \return const char*: the error message in the form of a c string
      */
     const char* what() const noexcept override;
 
 private:
 
-    FPGAError::Code error;  ///< 
+    FPGAError::Code error;  ///< The error code associated with the error
 
 };
 

@@ -11,6 +11,8 @@
 
 #include <catch.hpp>
 
+/// \todo Write tests for all of the modules and set up a testing suite here with good interface, use PLOG and Catch for easy usage
+
 int main(const int argc, const char* const kwargs) {
 
 

@@ -1,7 +1,7 @@
 /**
  * \file GUI.hpp
  * \author Orion Serup (orionserup@gmail.com)
- * \brief 
+ * \brief Conatins the declarations associated with the GUI Class
  * \version 0.1
  * \date 2022-01-28
  * 

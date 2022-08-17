@@ -1,7 +1,7 @@
 /**
  * \file Renderer.hpp
  * \author Orion Serup (orionserup@gmail.com)
- * \brief 
+ * \brief Contains the declarations and types for the rendering component
  * \version 0.1
  * \date 01-28-2022
  * 
