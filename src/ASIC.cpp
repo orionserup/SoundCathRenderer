@@ -290,6 +290,8 @@ std::string ASIC<params>::GetSerialNum() {
 template<ASICParams params>
 void ASIC<params>::SetSerialNum(const std::string& serialnum) {
 
+    PLOGD << fmt::format(FMT_COMPILE("{} Setting the Serial Number to: {}"), TAG, serialnum);
+    driver.Send(fmt::format(FMT_COMPILE("SerialNumber:0:{}")), serialnum);
     this->serialnum = serialnum;
 
 }
@@ -297,8 +299,13 @@ void ASIC<params>::SetSerialNum(const std::string& serialnum) {
 template<ASICParams params>
 double ASIC<params>::GetBandGapV() const {
 
-    
-    return 0.0f;
+    driver.Send("GetBandgap");
+    std::string resp = driver.GetResult();
+    auto end = resp.find('V');
+    std::string num = resp.substr(0, end - 1);
+    double result = std::stod(num);
+    PLOGD << fmt::format(FMT_COMPILE("{} Getting Bandgap, Bandgap: {}"), TAG, result);
+    return result;
 
 }
 
@@ -311,8 +318,7 @@ bool ASIC<params>::RunTests() const {
 }
 
 
-// --------------------------- Utility Functions ------------------------ //
-
+// --------------------------- Utility Functions ------------------------- //
 
 std::ostream& SoundCath::operator<<(std::ostream& os, const SoundCath::Delays& delays) {
 
