@@ -11,11 +11,14 @@
 #include "FPGA.hpp"
 
 #include <fmt/format.h>
+#include <plog/Log.h>
 #include <iostream>
 
 using SoundCath::FPGA;
 using SoundCath::FPGAError;
 using SoundCath::FPGAParams;
+
+static const char* TAG = "FPGA::"
 
 const char* FPGAError::GetErrorMessage(const FPGAError::Code error) noexcept {
 
@@ -53,7 +56,9 @@ const char* FPGAError::GetErrorMessage(const FPGAError::Code error) noexcept {
 template<FPGAParams params>
 FPGAError::Code FPGA<params>::GetError() const {
 
+    PLOGD << TAG << "Getting Error Code\n";
     std::string response = face.Query("GetAsicError");
+    PLOGD << TAG << "Recieved: " << response << '\n';
 
     // "GetASICError:RESULT:ASIC Error Status: hh, FPGA Error Status: hhhhhhhh" // h is a hex digit
 
@@ -79,7 +84,9 @@ FPGA<params>::FPGA(Driver& face): face(face) {
     }
     catch(const std::exception& e) {
 
+        
         std::cerr << "Error While Initializing FPGA:: " << e.what();
+        PLOGE << "Error While Initializing FPGA:: " << e.what();
         exit(1);
 
     }

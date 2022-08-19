@@ -19,7 +19,7 @@
 namespace SoundCath {
 
 /// Delay Values for a Group
-typedef std::array<int8_t, 64> GroupDelays;
+typedef std::array<int8_t, 16> GroupDelays;
 /// Phase Offsets 
 typedef GroupDelays GroupPhases;
 
@@ -165,6 +165,16 @@ public:
      * \param[in] elem: Element to Fire
      */
     void Fire(const Element elem);
+
+    /**
+     * \brief 
+     * 
+     * \param rxcoeffs
+     * \param txcoeffs
+     */
+    void Fire(const RxCoeffs& rxcoeffs, const TxCoeffs& txcoeffs);
+
+    
 
     // ------------------------ Fire Group Commands ---------------- //
 

@@ -10,17 +10,9 @@ project(SoundCathRenderer
 find_package(VTK COMPONENTS
     CommonColor
     CommonCore
-    CommonDataModel
     FiltersCore
     FiltersSources
-    IOXML
-    ImagingHybrid
-    InteractionStyle
-    RenderingContextOpenGL2
     RenderingCore
-    RenderingFreeType
-    RenderingGL2PSOpenGL2
-    RenderingOpenGL2
 )
 
 if(NOT VTK_FOUND)

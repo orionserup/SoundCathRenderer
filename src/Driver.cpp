@@ -12,10 +12,15 @@
 #include "Driver.hpp"
 #include "Exception.hpp"
 
+#include <fmt/format.h>
+#include <plog/Log.h>
+
 #include <iostream>
 
 using SoundCath::Driver;
 using SoundCath::DriverException;
+
+static const char* const TAG = "Driver::";
 
 #if defined(_WIN32) || defined(_WIN64)
 #define DLL "..\\..\\lib\\asic_call_wrapper_dll64.dll"
@@ -23,31 +28,35 @@ using SoundCath::DriverException;
 Driver::Driver() {
 
 	this->dll = LoadLibrary(DLL);
-		if (!this->dll) 
-            std::cerr << "\tERROR!!  DLL Not Found or Not Accessable\n";
+	if (!this->dll) { 
+        PLOGE << TAG << "DLL Not Found or Not Accessable\n";
+        exit(1);
+    }
 
 	asic_call_parse = (f_dllfunction)GetProcAddress(this->dll, "asic_call_parse");
-	if (!this->asic_call_parse) 
-        std::cerr << "\tERROR!!  Could Not Access or Find the ASIC Call Function in the DLL\n";
-
+	if (!this->asic_call_parse){ 
+        PLOGE << TAG << "Could Not Access or Find the ASIC Call Function in the DLL\n";
+        exit(1);
+    }
 }
 
 void Driver::Send(const std::string& command) const {
 
+    PLOGD << TAG << "Sending: " << command << '\n';
     int result = asic_call_parse((char*)command.c_str(), (char*)outbuffer.data());
 		
     if (result) {
 
         DriverError::ThrowErrors((DriverError::Code)result);
-        std::cerr << "Sent: " << GetOutString();
-    
+        PLOGE << fmt::format("{} Received Error Code from DLL {}\n", TAG, result);
+
     }
 }
 
 Driver::~Driver() {
 
     Send(CloseCommand());
-	//FreeLibrary(this->dll);
+	FreeLibrary(this->dll);
 
 }
 
@@ -130,6 +139,7 @@ std::string Driver::Query(const std::string& command) const {
 void Driver::Recv(std::string& output) const noexcept {
 
     output = GetOutString();
+    PLOGD << fmt::format("{} Received: {} from Device", TAG, output);
 
 }
 
